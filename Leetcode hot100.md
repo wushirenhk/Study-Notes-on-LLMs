@@ -157,6 +157,25 @@ class Solution(object):
 
 
 
+### [287. 寻找重复数](https://leetcode.cn/problems/find-the-duplicate-number/)
+
+```python
+class Solution(object):
+    def findDuplicate(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        hashset = set()
+        for i in nums:
+            if i in hashset:
+                return i
+            else:
+                hashset.add(i)
+```
+
+
+
 ### [15. 三数之和](https://leetcode.cn/problems/3sum/)
 
 ```python
@@ -624,4 +643,93 @@ class Solution(object):
 此为暴力解法，先反转再一个个比较值
 
 
+
+### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def hasCycle(self, head):
+        """
+        :type head: ListNode
+        :rtype: bool
+        """
+        current = head
+        hashset = set()
+        while current:
+            if current in hashset:
+                return True
+            hashset.add(current)
+            current = current.next
+        return False
+```
+
+
+
+### [142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def detectCycle(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        current = head
+        hashset = set()
+        while current:
+            if current in hashset:
+                return current
+            hashset.add(current)
+            current = current.next
+        return None
+```
+
+用哈希表解决，和[160. 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/)有相似之处
+
+此题也有用快慢指针的解决方法，但更为麻烦，需要数学上想通
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def detectCycle(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        slow = head
+        fast = head
+        
+        while fast and fast.next: 
+            slow = slow.next # 慢指针走1步
+            fast = fast.next.next # 快指针走2步
+            
+            # 快慢指针相遇 → 链表有环，开始找环的入口
+            if slow == fast:
+                # 关键步骤2：快慢指针以相同速度（1步/次）移动，直到相遇
+                slow = head
+                while slow != fast:
+                    slow = slow.next
+                    fast = fast.next
+                # 相遇点就是环的入口，返回该节点
+                return slow
+        # 循环终止（fast或fast.next为None）→ 无环，返回None
+        return None
+```
 
