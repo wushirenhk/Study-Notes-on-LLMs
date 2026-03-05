@@ -252,3 +252,376 @@ class Solution(object):
         return res
 ```
 
+
+
+## 链表
+
+### [203. 移除链表元素](https://leetcode.cn/problems/remove-linked-list-elements/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def removeElements(self, head, val):
+        """
+        :type head: Optional[ListNode]
+        :type val: int
+        :rtype: Optional[ListNode]
+        """
+        # 创建虚拟头部节点以简化删除过程
+        dummy_head = ListNode(next = head)
+        
+        # 遍历列表并删除值为val的节点
+        current = dummy_head
+        while current.next:
+            if current.next.val == val:
+                current.next = current.next.next
+            else:
+                current = current.next
+        
+        return dummy_head.next
+```
+
+
+
+### [707. 设计链表](https://leetcode.cn/problems/design-linked-list/)
+
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+class MyLinkedList(object):
+
+    def __init__(self):
+        self.dummy_head = ListNode()
+        self.size = 0
+
+
+    def get(self, index):
+        """
+        :type index: int
+        :rtype: int
+        """
+        if index < 0 or index >= self.size:
+            return -1
+        current = self.dummy_head
+        for i in range(index + 1):
+            current = current.next
+        return current.val
+        
+
+    def addAtHead(self, val):
+        """
+        :type val: int
+        :rtype: None
+        """
+        self.dummy_head.next = ListNode(val, self.dummy_head.next)
+        self.size += 1
+        
+
+    def addAtTail(self, val):
+        """
+        :type val: int
+        :rtype: None
+        """
+        current = self.dummy_head
+        while current.next:
+            current = current.next
+        current.next = ListNode(val)
+        self.size += 1
+        
+
+    def addAtIndex(self, index, val):
+        """
+        :type index: int
+        :type val: int
+        :rtype: None
+        """
+        current = self.dummy_head
+        if index < 0 or index > self.size:
+            return -1
+        else:
+            for i in range(index):
+                current = current.next
+            current.next =ListNode(val,current.next)
+            self.size += 1
+
+    def deleteAtIndex(self, index):
+        """
+        :type index: int
+        :rtype: None
+        """
+        current = self.dummy_head
+        if index < 0 or index >= self.size:
+            return -1
+        else:
+            for i in range(index):
+                current = current.next
+            current.next = current.next.next
+            self.size -= 1
+
+        
+# Your MyLinkedList object will be instantiated and called as such:
+# obj = MyLinkedList()
+# param_1 = obj.get(index)
+# obj.addAtHead(val)
+# obj.addAtTail(val)
+# obj.addAtIndex(index,val)
+# obj.deleteAtIndex(index)
+```
+
+
+
+### [19. 删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def removeNthFromEnd(self, head, n):
+        """
+        :type head: Optional[ListNode]
+        :type n: int
+        :rtype: Optional[ListNode]
+        """
+        def getLenghth(head):
+            current = head
+            length = 0
+            while current:
+                current = current.next
+                length += 1
+            return length
+        
+        dummy_head = ListNode(next=head)
+        current = dummy_head
+        length = getLenghth(head)
+        for i in range(length - n):
+            current = current.next
+        current.next = current.next.next
+
+        return dummy_head.next             
+```
+
+
+
+### [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def mergeTwoLists(self, list1, list2):
+        """
+        :type list1: Optional[ListNode]
+        :type list2: Optional[ListNode]
+        :rtype: Optional[ListNode]
+        """
+        if list1 is None:
+            return list2
+        elif list2 is None:
+            return list1
+        elif list1.val < list2.val:
+            list1.next = self.mergeTwoLists(list1.next, list2)
+            return list1
+        else:
+            list2.next = self.mergeTwoLists(list1, list2.next)
+            return list2
+```
+
+
+
+### [160. 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def getIntersectionNode(self, headA, headB):
+        """
+        :type head1, head1: ListNode
+        :rtype: ListNode
+        """
+        hashset = set()
+        currentA = headA
+        while currentA:
+            hashset.add(currentA)
+            currentA = currentA.next
+
+        currentB = headB
+        while currentB:
+            if currentB not in hashset:
+                currentB = currentB.next
+            else:
+                return currentB
+        return None
+```
+
+判断两个链表是否相交，可以使用哈希集合存储链表节点。
+
+首先遍历链表 headA，并将链表 headA 中的每个节点加入哈希集合中。然后遍历链表 headB，对于遍历到的每个节点，判断该节点是否在哈希集合中：
+
+如果当前节点不在哈希集合中，则继续遍历下一个节点；
+
+如果当前节点在哈希集合中，则后面的节点都在哈希集合中，即从当前节点开始的所有节点都在两个链表的相交部分，因此在链表 headB 中遍历到的第一个在哈希集合中的节点就是两个链表相交的节点，返回该节点。
+
+如果链表 headB 中的所有节点都不在哈希集合中，则两个链表不相交，返回 null。
+
+
+
+注意：题目要求找的是「两个链表的相交节点」（内存地址相同的同一个节点），而不是「值相同的节点」，此处不能写成将currentA.val放在hashset里，然后检查currentB中第一个在hashset中重复的值。
+
+
+
+### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def reverseList(self, head):
+        """
+        :type head: Optional[ListNode]
+        :rtype: Optional[ListNode]
+        """
+        cur = head   
+        pre = None
+        while cur:
+            temp = cur.next # 保存一下 cur的下一个节点，因为接下来要改变cur->next
+            cur.next = pre #反转
+            #更新pre、cur指针
+            pre = cur
+            cur = temp
+        return pre
+```
+
+
+
+### [24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def swapPairs(self, head):
+        """
+        :type head: Optional[ListNode]
+        :rtype: Optional[ListNode]
+        """
+        dummy_head = ListNode(next=head)
+        current = dummy_head
+
+        while current.next and current.next.next:
+            temp = current.next
+            temp2 = current.next.next
+            temp3 = current.next.next.next
+
+            current.next = temp2
+            current.next.next = temp
+            current.next.next.next = temp3
+            current = current.next.next
+        
+        return dummy_head.next
+            
+```
+
+
+
+### [234. 回文链表](https://leetcode.cn/problems/palindrome-linked-list/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def isPalindrome(self, head):
+        """
+        :type head: Optional[ListNode]
+        :rtype: bool
+        """
+        vals = []
+        current = head
+        while current:
+            vals.append(current.val)
+            current = current.next
+        return vals == vals[::-1] 
+```
+
+一共为两个步骤：
+
+1. 复制链表值到数组列表中。
+2. 使用双指针法判断是否为回文。
+
+回文常用vals == vals[::-1] 进行判断
+
+
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def isPalindrome(self, head):
+        """
+        :type head: Optional[ListNode]
+        :rtype: bool
+        """
+        def reverseList(head):
+            pre = None
+            cur = head
+            while cur:
+                temp = cur.next
+                cur.next = pre
+                pre = cur
+                cur = temp
+            return pre
+        
+        dummy = ListNode()
+        copy_current = dummy
+        original_current = head
+        while original_current:
+            copy_current.next = ListNode(original_current.val)
+            copy_current = copy_current.next
+            original_current = original_current.next
+        copy_head = dummy.next
+        
+        reversed_head = reverseList(copy_head)
+        reversed_current = reversed_head
+        current = head
+        while current:
+            if current.val != reversed_current.val:
+                return False
+            else:
+                current = current.next
+                reversed_current = reversed_current.next
+        return True
+```
+
+此为暴力解法，先反转再一个个比较值
+
+
+
