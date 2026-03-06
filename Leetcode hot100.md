@@ -2,6 +2,180 @@
 
 https://lqn53uggjd7.feishu.cn/wiki/VZMEwd6R2iTwIMk32uNc9wbCnpg?from=from_copylink
 
+## 双指针&滑动窗口
+
+### [283. 移动零](https://leetcode.cn/problems/move-zeroes/)
+
+```python
+class Solution(object):
+    def moveZeroes(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        index = 0
+        for i in nums:
+            if i != 0:
+                nums[index] = i
+                index += 1
+        while index < len(nums):
+            nums[index] = 0
+            index += 1
+```
+
+两趟扫描，先顺序扫描不为0的元素依次放置到index，index++，第二趟从index开始后面全部赋值为0
+
+```python
+class Solution(object):
+    def moveZeroes(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        n = len(nums)
+        left = right = 0
+        while right < n:
+            if nums[right] != 0:
+                nums[left], nums[right] = nums[right], nums[left]
+                left += 1
+            right += 1
+```
+
+一趟扫描，left用于存放下一个要放非0元素的位置，right用于检查当前元素是不是非0
+
+
+
+### [11. 盛最多水的容器](https://leetcode.cn/problems/container-with-most-water/)
+
+```python
+class Solution(object):
+    def maxArea(self, height):
+        """
+        :type height: List[int]
+        :rtype: int
+        """
+        left = 0
+        right = len(height) - 1
+        max_area = 0
+        while left < right:
+            w = right - left
+            h = min(height[left], height[right])
+            max_area = max(max_area, w * h)
+
+            if(height[left] < height[right]):
+                left += 1
+            else:
+                right -= 1
+
+        return max_area
+```
+
+容纳的水量是由  两个指针指向的数字中较小值∗指针之间的距离决定的，因为左右指针每次移动高度（数字中值较小的那一个）向中心。最后停止的条件是left和right指针不重合，即left<right
+
+
+
+### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)
+
+```python
+class Solution(object):
+    def lengthOfLongestSubstring(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        maxlen = 0
+        for left in range(len(s)):
+            hashset = set()
+            right = left
+            currentlen = 0
+            while right < len(s):
+                if s[right] in hashset:
+                    # 遇到重复，更新最大长度并终止当前起点的遍历
+                    maxlen = max(currentlen, maxlen)
+                    break
+                else:
+                    hashset.add(s[right])
+                    right += 1
+                    currentlen += 1
+            # 遍历到末尾仍无重复
+            maxlen = max(currentlen, maxlen)
+        return maxlen
+        
+```
+
+
+
+### [438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)
+
+```python
+class Solution(object):
+    def findAnagrams(self, s, p):
+        """
+        :type s: str
+        :type p: str
+        :rtype: List[int]
+        """
+        slen = len(s)
+        plen = len(p)
+        if slen < plen:
+            return []
+
+        res = []
+        s_record = [0] * 26
+        p_record = [0] * 26
+        # 统计p中各个单词出现的频率
+        for i in range(plen):
+            s_record[ord(s[i]) - ord('a')] += 1
+            p_record[ord(p[i]) - ord('a')] += 1
+
+        if s_record == p_record:
+            res.append(0)
+            
+        # 循环次数 = s_len - p_len（比如s长5，p长3，循环2次：i=0→起始索引1；i=1→起始索引2）
+        for i in range(slen - plen):
+            # 步骤1：移除窗口左边界的字符（s[i]）
+            s_record[ord(s[i]) - ord('a')] -= 1
+            # 步骤2：添加窗口右边界的新字符（s[i + p_len]）
+            s_record[ord(s[i + plen]) - ord('a')] += 1
+            if s_record == p_record:
+                res.append(i + 1)
+        
+        return res
+```
+
+
+
+### [209. 长度最小的子数组](https://leetcode.cn/problems/minimum-size-subarray-sum/)
+
+```python
+class Solution(object):
+    def minSubArrayLen(self, target, nums):
+        """
+        :type target: int
+        :type nums: List[int]
+        :rtype: int
+        """
+        n = len(nums)
+        left = 0
+        right = 0
+        min_len = float('inf')
+        cur_sum = 0
+        while right < n:
+            cur_sum += nums[right]
+
+            # 累加值大于目标值
+            while cur_sum >= target:
+                min_len = min(min_len, right - left + 1)
+                cur_sum -= nums[left]
+                left += 1
+            right += 1
+        
+        if min_len != float('inf'):
+            return min_len
+        else:
+            return 0
+```
+
 
 
 ## 哈希表
@@ -733,3 +907,397 @@ class Solution(object):
         return None
 ```
 
+
+
+### [2. 两数相加](https://leetcode.cn/problems/add-two-numbers/)
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: Optional[ListNode]
+        :type l2: Optional[ListNode]
+        :rtype: Optional[ListNode]
+        """
+        if l1.val + l2.val >= 10:
+            carry = 1
+        else:
+            carry = 0
+        node = ListNode((l1.val + l2.val) % 10)
+        current = node
+
+        if l1.next and l2.next:
+            while l1.next and l2.next:
+                current.next = ListNode((l1.next.val + l2.next.val + carry) % 10)
+                carry = (l1.next.val + l2.next.val + carry) / 10
+                l1 = l1.next
+                l2 = l2.next
+                current = current.next
+        
+        #如果l2已经遍历完了，则接着只遍历l1
+        if l1.next and l2.next is None:
+            while l1.next:
+                current.next = ListNode((l1.next.val + carry) % 10)
+                carry = (l1.next.val + carry) / 10
+                l1 = l1.next
+                current = current.next
+
+        #如果l1已经遍历完了，则接着只遍历l2
+        if l2.next and l1.next is None:
+            while l2.next:
+                current.next = ListNode((l2.next.val + carry) % 10)
+                carry = (l2.next.val + carry) / 10
+                l2 = l2.next
+                current = current.next
+
+        if carry:
+            current.next = ListNode(1)
+        
+        return node
+```
+
+我们同时遍历两个链表，逐位计算它们的和，并与当前位置的进位值相加。具体而言，如果当前两个链表处相应位置的数字为 n1,n2，进位值为 carry，则它们的和为 n1+n2+carry；其中，答案链表处相应位置的数字为 (n1+n2+carry)mod10，即(n1+n2+carry)%10，而新的进位值为 （n1+n2+carry）/10。
+
+
+
+## 二叉树DFS
+
+前序遍历：中左右
+
+中序遍历：左中右
+
+后序遍历：左右中
+
+### [144. 二叉树的前序遍历](https://leetcode.cn/problems/binary-tree-preorder-traversal/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def preorderTraversal(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: List[int]
+        """
+        res = []
+
+        def dfs(node):
+            if node is None:
+                return None
+            # 前序：中左右
+            res.append(node.val)
+            dfs(node.left)
+            dfs(node.right)
+
+        dfs(root)
+
+        return res
+```
+
+
+
+### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def inorderTraversal(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: List[int]
+        """
+        res = []
+        # 中序：左中右
+        def dfs(node):
+            if node is None:
+                return None
+            
+            dfs(node.left)
+            res.append(node.val)
+            dfs(node.right)
+        
+        dfs(root)
+
+        return res
+```
+
+
+
+### [145. 二叉树的后序遍历](https://leetcode.cn/problems/binary-tree-postorder-traversal/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def postorderTraversal(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: List[int]
+        """
+        res = []
+        # 后序：左右中
+        def dfs(node):
+            if node is None:
+                return None
+            
+            dfs(node.left)
+            dfs(node.right)
+            res.append(node.val)
+        
+        dfs(root)
+
+        return res
+```
+
+
+
+### [114. 二叉树展开为链表](https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def flatten(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: None Do not return anything, modify root in-place instead.
+        """
+        res = []
+
+        def dfs(node):
+            if node is None:
+                return []
+            res.append(node)
+            dfs(node.left)
+            dfs(node.right)
+
+        dfs(root)
+        for i in range(len(res) - 1):
+            res[i].left = None
+            res[i].right = res[i + 1]
+```
+
+先dfs前序遍历，然后给每个节点左节点改为null，右节点改为前序遍历的下一个节点
+
+
+
+## 二叉树BFS
+
+### [102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tree-level-order-traversal/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def levelOrder(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: List[List[int]]
+        """
+        if root is None:
+            return []
+            
+        queue = collections.deque([root])
+        res = []
+        while queue:
+            level = []
+            for i in range(len(queue)):
+                current = queue.popleft()
+                level.append(current.val)
+                if current.left:
+                    queue.append(current.left)
+                if current.right:
+                    queue.append(current.right)
+            res.append(level)
+
+        return res
+```
+
+
+
+### [104. 二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def maxDepth(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: int
+        """
+        if root is None:
+            return 0
+
+        queue = collections.deque([root])
+        depth = 0
+        while queue:
+            level = []
+            depth += 1
+            for i in range(len(queue)):
+                current = queue.popleft()
+                level.append(current.val)
+                if current.left:
+                    queue.append(current.left)
+                if current.right:
+                    queue.append(current.right)
+              
+        return depth
+```
+
+
+
+### [111. 二叉树的最小深度](https://leetcode.cn/problems/minimum-depth-of-binary-tree/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def minDepth(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: int
+        """
+        if root is None:
+            return 0
+        
+        queue = collections.deque([root])
+        depth = 0
+        
+        while queue:
+            level = []
+            depth += 1
+            for i in range(len(queue)):
+                current = queue.popleft()
+                level.append(current.val)
+                if current.left:
+                    queue.append(current.left)
+                if current.right:
+                    queue.append(current.right)
+                if current.left is None and current.right is None:
+                    return depth
+
+        return depth
+```
+
+
+
+### [226. 翻转二叉树](https://leetcode.cn/problems/invert-binary-tree/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def invertTree(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: Optional[TreeNode]
+        """
+        if root is None:
+            return None
+
+        root.left, root.right = root.right, root.left
+        self.invertTree(root.left)
+        self.invertTree(root.right)
+
+        return root
+```
+
+按前序遍历的方式翻转二叉树比较合适
+
+
+
+### [101. 对称二叉树](https://leetcode.cn/problems/symmetric-tree/)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def isSymmetric(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: bool
+        """
+        if root is None:
+            return True
+
+        queue = collections.deque([root])
+
+        while queue:
+            level = []
+            for i in range(len(queue)):
+                current = queue.popleft()
+                if current is not None:
+                    level.append(current.val)
+                    queue.append(current.left)
+                    queue.append(current.right)
+                else:
+                    level.append(None)
+
+            if level != level[::-1]:
+                return False
+        
+        return True
+```
+
+
+
+## 技巧
+
+### [169. 多数元素](https://leetcode.cn/problems/majority-element/)
+
+```python
+class Solution(object):
+    def majorityElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        nums.sort()
+        res = nums[len(nums) // 2]
+        return res
+```
+
+如果将数组 `nums` 中的所有元素按照单调递增或单调递减的顺序排序，那么下标为 ⌊n/2⌋ 的元素（下标从 `0` 开始）一定是众数。
