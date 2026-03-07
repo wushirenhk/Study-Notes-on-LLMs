@@ -1,4 +1,4 @@
-# Leetcode hot100
+# Leetcode Hot100
 
 https://lqn53uggjd7.feishu.cn/wiki/VZMEwd6R2iTwIMk32uNc9wbCnpg?from=from_copylink
 
@@ -42,6 +42,32 @@ class Solution(object):
 ```
 
 一趟扫描，left用于存放下一个要放非0元素的位置，right用于检查当前元素是不是非0
+
+
+
+### [75. 颜色分类](https://leetcode.cn/problems/sort-colors/)
+
+```python
+class Solution(object):
+    def sortColors(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        n = len(nums)
+        index = 0
+        for i in range(n):
+            if nums[i] == 0:
+                nums[i], nums[index] = nums[index], nums[i]
+                index += 1
+
+        for i in range(index, n):
+            if nums[i] == 1:
+                nums[i], nums[index] = nums[index], nums[i]
+                index += 1
+```
+
+单指针，类似283. 移动零一次扫描，先把0全部交换到前面，再把1全部交换到0后面
 
 
 
@@ -395,6 +421,87 @@ class Solution(object):
 
 
 
+## 回溯
+
+### [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)
+
+```python
+class Solution(object):
+    def __init__(self):
+        self.letterMap = [
+            "",     # 0
+            "",     # 1
+            "abc",  # 2
+            "def",  # 3
+            "ghi",  # 4
+            "jkl",  # 5
+            "mno",  # 6
+            "pqrs", # 7
+            "tuv",  # 8
+            "wxyz"  # 9
+        ]
+        self.result = []
+        self.s = ""
+
+    def backtracking(self, digits, index):
+        if index == len(digits):
+            self.result.append(self.s)
+            return
+
+        # 将索引处的数字转换为整数
+        digit = int(digits[index])
+        # 获取对应的字符集
+        letters = self.letterMap[digit]
+        for i in range(len(letters)):
+            # 处理字符
+            self.s += letters[i]
+            # 递归调用，注意索引加1，处理下一个数字
+            self.backtracking(digits, index + 1)
+            # 回溯，删除最后添加的字符
+            self.s = self.s[:-1]
+
+    def letterCombinations(self, digits):
+        """
+        :type digits: str
+        :rtype: List[str]
+        """
+        self.backtracking(digits, 0)
+        return self.result
+```
+
+
+
+### [78. 子集](https://leetcode.cn/problems/subsets/)
+
+```python
+class Solution(object):
+
+    def backtracking(self, nums, start_index, path, result):
+        # 收集子集，要放在终止添加的上面，否则会漏掉自己
+        result.append(path[:])
+
+        if start_index == len(nums):
+            return 
+
+        for i in range(start_index, len(nums)):
+            path.append(nums[i])
+            self.backtracking(nums, i + 1, path, result)
+            path.pop()
+
+    def subsets(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        result = []
+        path = []
+        self.backtracking(nums, 0, path, result)
+
+        return result
+```
+
+
+
 ## 动态规划
 
 ### [70. 爬楼梯](https://leetcode.cn/problems/climbing-stairs/)
@@ -444,6 +551,256 @@ class Solution(object):
 
         return res
 ```
+
+
+
+### [198. 打家劫舍](https://leetcode.cn/problems/house-robber/)
+
+```python
+class Solution(object):
+    def rob(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        n = len(nums)
+        if n == 0:
+            return 0
+        if n == 1:
+            return nums[0]
+        # dp[i]：考虑下标i（包括i）以内的房屋，最多可以偷窃的金额为dp[i]
+        dp = [0] * n
+        dp[0] = nums[0]
+        dp[1] = max(nums[0], nums[1])
+
+        for i in range(2, n):
+            dp[i] = max(dp[i - 2] + nums[i], dp[i - 1])
+        
+        return dp[-1]
+```
+
+
+
+## 动态规划0-1背包
+
+### [416. 分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum/)
+
+```python
+class Solution(object):
+    def canPartition(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: bool
+        """
+        total_sum = sum(nums)
+        if total_sum % 2 != 0:
+            return False
+        
+        target_sum = total_sum // 2
+        dp = [False] * (target_sum + 1)
+        dp[0] = True
+
+        # 遍历物品
+        for i in range(len(nums)):
+            # 遍历背包
+            # 关键：倒序遍历背包容量，避免重复选当前元素
+            for j in range(target_sum, nums[i] - 1, -1):
+                dp[j] = dp[j] or dp[j - nums[i]]
+
+        return dp[target_sum]
+```
+
+
+
+## 动态规划完全背包
+
+### [518. 零钱兑换 II](https://leetcode.cn/problems/coin-change-ii/)
+
+```python
+class Solution(object):
+    def change(self, amount, coins):
+        """
+        :type amount: int
+        :type coins: List[int]
+        :rtype: int
+        """
+        dp = [0] * (amount + 1)
+        dp[0] = 1
+
+        # 遍历物品
+        for i in range(len(coins)):
+            # 遍历背包
+            for j in range(coins[i], amount + 1):
+                dp[j] += dp[j - coins[i]]
+            
+        return dp[amount]
+```
+
+
+
+### [322. 零钱兑换](https://leetcode.cn/problems/coin-change/)
+
+```python
+class Solution(object):
+    def coinChange(self, coins, amount):
+        """
+        :type coins: List[int]
+        :type amount: int
+        :rtype: int
+        """
+        dp = [float('inf')] * (amount + 1)
+        dp[0] = 0
+
+        # 遍历物品
+        for i in range(len(coins)):
+            # 遍历背包
+            for j in range(coins[i], amount + 1):
+                dp[j] = min(dp[j - coins[i]] + 1, dp[j])
+
+        if dp[amount] == float('inf'):
+            return -1
+
+        return dp[amount] 
+```
+
+凑足总额为j - coins[i]的最少个数为dp[j - coins[i]]，那么只需要加上一个钱币coins[i]即dp[j - coins[i]] + 1就是dp[j]（考虑coins[i]）
+
+所以dp[j] 要取所有 dp[j - coins[i]] + 1 中最小的。
+
+递推公式：dp[j] = min(dp[j - coins[i]] + 1, dp[j]);
+
+
+
+### [279. 完全平方数](https://leetcode.cn/problems/perfect-squares/)
+
+```python
+class Solution(object):
+    def numSquares(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        dp = [float('inf')] * (n + 1)
+        dp[0] = 0
+
+        # 遍历物品
+        for i in range(1, int(n ** 0.5) + 1):
+            # 遍历背包
+            for j in range(i * i, n + 1):
+                dp[j] = min(dp[j - i * i] + 1, dp[j])
+        
+        return dp[n]
+```
+
+我们只需要遍历所有满足`i² ≤ n`的正整数`i`—— 也就是`i`的取值范围是 `1 ≤ i ≤ √n`
+
+
+
+### [139. 单词拆分](https://leetcode.cn/problems/word-break/)
+
+```python
+class Solution(object):
+    def wordBreak(self, s, wordDict):
+        """
+        :type s: str
+        :type wordDict: List[str]
+        :rtype: bool
+        """
+        hashset = set(wordDict)
+        n = len(s)
+        dp = [False] * (n + 1)
+        dp[0] =  True
+
+        # 遍历背包
+        for i in range(1, n + 1):
+            # 遍历物品
+            for j in range(i):
+                # 如果 s[0:j] 可以被拆分成单词，并且 s[j:i] 在单词集合中存在，则 s[0:i] 可以被拆分成单词
+                if dp[j] and s[j:i] in hashset:
+                    dp[i] = True
+                    break
+        
+        return dp[n]
+```
+
+`dp[i]` 表示前`i`个字符能否拆分，是判断的核心目标；
+
+`j` 是分割点，`s[j:i]` 是分割后 “最后一个待验证的单词”；
+
+
+
+### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
+
+```python
+class Solution(object):
+    def lengthOfLIS(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        res = 1
+        n = len(nums)
+        dp = [1] * n
+        for i in range(1, n):
+            for j in range(i):
+                if nums[i] > nums[j]:
+                    dp[i] = max(dp[i], dp[j] + 1)
+            res = max(res, dp[i])
+
+        return res
+```
+
+dp[i]表示i之前包括i的以nums[i]结尾的最长递增子序列的长度
+
+
+
+### [53. 最大子数组和](https://leetcode.cn/problems/maximum-subarray/)
+
+```python
+class Solution(object):
+    def maxSubArray(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        res = nums[0]
+        n = len(nums)
+        dp_max = [nums[0]] * n
+
+        for i in range(1, n):
+            dp_max[i] = max(nums[i], dp_max[i - 1] + nums[i])
+            res = max(res, dp_max[i])
+
+        return res
+```
+
+
+
+### [152. 乘积最大子数组](https://leetcode.cn/problems/maximum-product-subarray/)
+
+```python
+class Solution(object):
+    def maxProduct(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        res = nums[0]
+        n = len(nums)
+        dp_max = [nums[0]] * n
+        dp_min = [nums[0]] * n
+
+        for i in range(1, n):
+            dp_max[i] = max(nums[i], dp_max[i - 1] * nums[i], dp_min[i - 1] * nums[i])
+            dp_min[i] = min(nums[i], dp_max[i - 1] * nums[i], dp_min[i - 1] * nums[i])
+            res = max(res, dp_max[i])
+            
+        return res
+```
+
+类似53. 最大子数组和，我们可以根据正负性进行分类讨论。
+
+考虑当前位置如果是一个负数的话，那么我们希望以它前一个位置结尾的某个段的积也是个负数，这样就可以负负得正，并且我们希望这个积尽可能「负得更多」，即尽可能小。如果当前位置是一个正数的话，我们更希望以它前一个位置结尾的某个段的积也是个正数，并且希望它尽可能地大。
 
 
 
