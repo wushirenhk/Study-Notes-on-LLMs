@@ -754,6 +754,29 @@ dp[i]表示i之前包括i的以nums[i]结尾的最长递增子序列的长度
 
 
 
+### [121. 买卖股票的最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)
+
+```python
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        length = len(prices)
+        if length == 0:
+            return 0
+        dp = [[0] * 2 for _ in range(length)]
+        dp[0][0] = -prices[0]
+        dp[0][1] = 0
+        for i in range(1, length):
+            dp[i][0] = max(dp[i-1][0], -prices[i])
+            dp[i][1] = max(dp[i-1][1], prices[i] + dp[i-1][0])
+        return dp[-1][1]
+```
+
+
+
 ### [53. 最大子数组和](https://leetcode.cn/problems/maximum-subarray/)
 
 ```python
