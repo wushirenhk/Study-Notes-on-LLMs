@@ -4,7 +4,7 @@ https://lqn53uggjd7.feishu.cn/wiki/VZMEwd6R2iTwIMk32uNc9wbCnpg?from=from_copylin
 
 ## 双指针&滑动窗口
 
-### [283. 移动零](https://leetcode.cn/problems/move-zeroes/)
+### [283. 移动零](https://leetcode.cn/problems/move-zeroes/)🔥
 
 ```python
 class Solution(object):
@@ -45,7 +45,7 @@ class Solution(object):
 
 
 
-### [75. 颜色分类](https://leetcode.cn/problems/sort-colors/)
+### [75. 颜色分类🔥](https://leetcode.cn/problems/sort-colors/)
 
 ```python
 class Solution(object):
@@ -71,7 +71,7 @@ class Solution(object):
 
 
 
-### [11. 盛最多水的容器](https://leetcode.cn/problems/container-with-most-water/)
+### [11. 盛最多水的容器](https://leetcode.cn/problems/container-with-most-water/)🔥
 
 ```python
 class Solution(object):
@@ -100,7 +100,7 @@ class Solution(object):
 
 
 
-### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)
+### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)🔥
 
 ```python
 class Solution(object):
@@ -131,7 +131,7 @@ class Solution(object):
 
 
 
-### [438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)
+### [438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)🔥
 
 ```python
 class Solution(object):
@@ -231,7 +231,7 @@ class Solution(object):
 
 
 
-### [49. 字母异位词分组](https://leetcode.cn/problems/group-anagrams/)
+### [49. 字母异位词分组🔥](https://leetcode.cn/problems/group-anagrams/)
 
 ```python
 class Solution(object):
@@ -254,7 +254,7 @@ class Solution(object):
 
 
 
-### [1. 两数之和](https://leetcode.cn/problems/two-sum/)
+### [1. 两数之和🔥](https://leetcode.cn/problems/two-sum/)
 
 ```python
 class Solution(object):
@@ -275,7 +275,7 @@ class Solution(object):
 
 
 
-### [128. 最长连续序列](https://leetcode.cn/problems/longest-consecutive-sequence/)
+### [128. 最长连续序列](https://leetcode.cn/problems/longest-consecutive-sequence/)🔥
 
 ```python
 class Solution(object):
@@ -310,7 +310,7 @@ class Solution(object):
 
 
 
-### [136. 只出现一次的数字](https://leetcode.cn/problems/single-number/)
+### [136. 只出现一次的数字🔥](https://leetcode.cn/problems/single-number/)
 
 ```python
 class Solution(object):
@@ -357,7 +357,7 @@ class Solution(object):
 
 
 
-### [287. 寻找重复数](https://leetcode.cn/problems/find-the-duplicate-number/)
+### [287. 寻找重复数](https://leetcode.cn/problems/find-the-duplicate-number/)🔥
 
 ```python
 class Solution(object):
@@ -376,7 +376,7 @@ class Solution(object):
 
 
 
-### [15. 三数之和](https://leetcode.cn/problems/3sum/)
+### [15. 三数之和🔥](https://leetcode.cn/problems/3sum/)
 
 ```python
 class Solution(object):
@@ -423,7 +423,7 @@ class Solution(object):
 
 ## 回溯
 
-### [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)
+### [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)🔥
 
 ```python
 class Solution(object):
@@ -471,7 +471,7 @@ class Solution(object):
 
 
 
-### [78. 子集](https://leetcode.cn/problems/subsets/)
+### [78. 子集](https://leetcode.cn/problems/subsets/)🔥
 
 ```python
 class Solution(object):
@@ -502,9 +502,360 @@ class Solution(object):
 
 
 
+## 栈
+
+### [232. 用栈实现队列](https://leetcode.cn/problems/implement-queue-using-stacks/)
+
+```python
+class MyQueue(object):
+
+    def __init__(self):
+        self.stack_in = []
+        self.stack_out = []
+
+    def push(self, x):
+        """
+        :type x: int
+        :rtype: None
+        """
+        self.stack_in.append(x)
+        
+
+    def pop(self):
+        """
+        :rtype: int
+        """
+        if self.empty():
+            return None
+        
+        if self.stack_out:
+            return self.stack_out.pop()
+        else:
+            for i in range(len(self.stack_in)):
+                self.stack_out.append(self.stack_in.pop())
+            return self.stack_out.pop()
+        
+
+    def peek(self):
+        """
+        :rtype: int
+        """
+        res = self.pop()
+        self.stack_out.append(res)
+        return res
+
+    def empty(self):
+        """
+        :rtype: bool
+        """
+        return not (self.stack_in or self.stack_out)
+        
+
+
+# Your MyQueue object will be instantiated and called as such:
+# obj = MyQueue()
+# obj.push(x)
+# param_2 = obj.pop()
+# param_3 = obj.peek()
+# param_4 = obj.empty()
+```
+
+
+
+### [20. 有效的括号](https://leetcode.cn/problems/valid-parentheses/)🔥（简单）
+
+```python
+class Solution(object):
+    def isValid(self, s):
+        """
+        :type s: str
+        :rtype: bool
+        """
+        stack = []
+
+        for item in s:
+            if item == '(':
+                stack.append(')')
+            elif item == '[':
+                stack.append(']')
+            elif item == '{':
+                stack.append('}')
+            # 注意要先判断栈是否为空，再判断栈顶元素是否和当前元素相等
+            elif not stack or stack[-1] != item:
+                return False
+            else:
+                stack.pop()
+            
+        return True if not stack else False
+```
+
+
+
+### [155. 最小栈](https://leetcode.cn/problems/min-stack/)🔥（一般）
+
+```python
+class MinStack(object):
+
+    def __init__(self):
+        self.stack = []
+        self.stackmin = []
+
+    def push(self, val):
+        """
+        :type val: int
+        :rtype: None
+        """
+        self.stack.append(val)
+        if self.stackmin:
+            temp = min(val, self.stackmin[-1])
+            self.stackmin.append(temp)
+        else:
+            self.stackmin.append(val)
+        
+    def pop(self):
+        """
+        :rtype: None
+        """
+        self.stack.pop()
+        self.stackmin.pop()
+
+    def top(self):
+        """
+        :rtype: int
+        """
+        return self.stack[-1]
+
+    def getMin(self):
+        """
+        :rtype: int
+        """
+        return self.stackmin[-1]
+
+
+# Your MinStack object will be instantiated and called as such:
+# obj = MinStack()
+# obj.push(val)
+# obj.pop()
+# param_3 = obj.top()
+# param_4 = obj.getMin()
+```
+
+
+
+### [394. 字符串解码](https://leetcode.cn/problems/decode-string/)🔥（一般）
+
+```python
+class Solution(object):
+    def decodeString(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        stack = []
+        for ch in s:
+            if ch != ']': 
+                stack.append(ch)
+            else:
+                temp = ""
+                while stack[-1] != '[':
+                    temp = stack.pop() + temp
+                stack.pop() # 把'['弹出来
+                num = ''
+                while stack and stack[-1].isdigit():
+                    num = stack.pop() + num
+                stack.append(temp * int(num))
+        res = ''
+        while stack:
+            res = stack.pop() + res
+
+        return res        
+```
+
+
+
+### [739. 每日温度](https://leetcode.cn/problems/daily-temperatures/)🔥（一般）
+
+```python
+class Solution(object):
+    def dailyTemperatures(self, temperatures):
+        """
+        :type temperatures: List[int]
+        :rtype: List[int]
+        """
+        res = [0] * len(temperatures)
+        stack = [0] # 存入元素对应的下标
+        for i in range(1, len(temperatures)):
+            if temperatures[i] <= temperatures[stack[-1]]:
+                stack.append(i)
+            else:
+                while stack and temperatures[i] > temperatures[stack[-1]]:
+                    res[stack[-1]] = i - stack[-1]
+                    stack.pop()
+                stack.append(i)
+
+        return res
+```
+
+这里我们要使用递增循序（再强调一下是指从栈头到栈底的顺序），因为只有递增的时候，栈里要加入一个元素i的时候，才知道栈顶元素在数组中右面第一个比栈顶元素大的元素是i。
+
+递增顺序是找比当前元素大的
+
+
+
+### [42. 接雨水](https://leetcode.cn/problems/trapping-rain-water/)🔥（困难）
+
+```python
+class Solution(object):
+    def trap(self, height):
+        """
+        :type height: List[int]
+        :rtype: int
+        """
+        stack = [0]
+        res = 0
+
+        for i in range(1,  len(height)):
+            while stack and height[i] >= height[stack[-1]]:
+                mid_height = stack.pop()
+                if stack:
+                    # 雨水高度是 min(凹槽左侧高度, 凹槽右侧高度) - 凹槽底部高度
+                    h = min(height[i], height[stack[-1]]) - height[mid_height]
+                    w = i - stack[-1] - 1
+                    res += h * w
+            stack.append(i)
+
+        return res
+```
+
+单调栈中为递增序列，求左右比当前更大的元素
+
+
+
+### [84. 柱状图中最大的矩形](https://leetcode.cn/problems/largest-rectangle-in-histogram/)🔥（困难）
+
+```python
+class Solution(object):
+    def largestRectangleArea(self, heights):
+        """
+        :type heights: List[int]
+        :rtype: int
+        """
+        stack = [0]
+        res = 0
+        heights.insert(0,0)
+        heights.append(0) 
+        # 也可以写成[0] + heights + [0]
+
+        for i in range(1, len(heights)):
+            while stack and heights[i] <= heights[stack[-1]]:
+                mid_height = stack.pop()
+                if stack:
+                    h = heights[mid_height]
+                    w = i - stack[-1] - 1
+                    res = max(res, h * w)
+            stack.append(i)
+        
+        return res
+```
+
+单调栈中为递减序列，求左右比当前更小的元素
+
+首先来说末尾为什么要加元素0？
+
+[84.柱状图中最大的矩形 | 代码随想录](https://programmercarl.com/0084.柱状图中最大的矩形.html#思路)
+
+
+
+## 贪心算法
+
+### [55. 跳跃游戏](https://leetcode.cn/problems/jump-game/)🔥
+
+```python
+class Solution(object):
+    def canJump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: bool
+        """
+        cover = 0
+        if len(nums) == 1:
+            return True
+
+        i = 0
+        while i <= cover:
+            cover = max(i + nums[i], cover)
+            if cover >= len(nums) - 1:
+                return True
+            i += 1
+        
+        return False
+```
+
+贪心算法局部最优解：每次取最大跳跃步数（取最大覆盖范围），整体最优解：最后得到整体最大覆盖范围，看是否能到终点。
+
+
+
+### [45. 跳跃游戏 II🔥](https://leetcode.cn/problems/jump-game-ii/)
+
+```python
+class Solution(object):
+    def jump(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums)==1:  # 如果数组只有一个元素，不需要跳跃，步数为0
+            return 0
+        
+        i = 0  # 当前位置
+        count = 0  # 步数计数器
+        cover = 0  # 当前能够覆盖的最远距离
+        
+        while i <= cover:  # 当前位置小于等于当前能够覆盖的最远距离时循环
+            for i in range(i, cover+1):  # 遍历从当前位置到当前能够覆盖的最远距离之间的所有位置
+                cover = max(nums[i]+i, cover)  # 更新当前能够覆盖的最远距离
+                if cover >= len(nums)-1:  # 如果当前能够覆盖的最远距离达到或超过数组的最后一个位置，直接返回步数+1
+                    return count+1
+            count += 1  # 每一轮遍历结束后，步数+1
+```
+
+贪心的思路，局部最优：当前可移动距离尽可能多走，如果还没到终点，步数再加一。整体最优：一步尽可能多走，从而达到最少步数。
+
+
+
+### [763. 划分字母区间🔥](https://leetcode.cn/problems/partition-labels/)
+
+```python
+class Solution(object):
+    def partitionLabels(self, s):
+        """
+        :type s: str
+        :rtype: List[int]
+        """
+        # 存储每个字符最后出现的位置
+        last_occurence = {}
+        for index, ch in enumerate(s):
+            last_occurence[ch] = index
+        
+        res = []
+        start = 0
+        end = 0
+        for index, ch in enumerate(s):
+            # 找到当前字符出现的最远位置
+            end = max(end, last_occurence[ch])
+            # 如果当前位置是最远位置，表示可以分割出一个区间
+            if index == end:
+                res.append(end - start + 1)
+                start = index + 1
+        
+        return res
+```
+
+
+
 ## 动态规划
 
-### [70. 爬楼梯](https://leetcode.cn/problems/climbing-stairs/)
+### [70. 爬楼梯🔥](https://leetcode.cn/problems/climbing-stairs/)
 
 ```python
 class Solution(object):
@@ -530,7 +881,7 @@ dp[i]:达到i阶有dp[i]种方法
 
 
 
-### [118. 杨辉三角](https://leetcode.cn/problems/pascals-triangle/)
+### [118. 杨辉三角🔥](https://leetcode.cn/problems/pascals-triangle/)
 
 ```python
 class Solution(object):
@@ -554,7 +905,7 @@ class Solution(object):
 
 
 
-### [198. 打家劫舍](https://leetcode.cn/problems/house-robber/)
+### [198. 打家劫舍](https://leetcode.cn/problems/house-robber/)🔥
 
 ```python
 class Solution(object):
@@ -583,7 +934,7 @@ class Solution(object):
 
 ## 动态规划0-1背包
 
-### [416. 分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum/)
+### [416. 分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum/)🔥
 
 ```python
 class Solution(object):
@@ -638,7 +989,7 @@ class Solution(object):
 
 
 
-### [322. 零钱兑换](https://leetcode.cn/problems/coin-change/)
+### [322. 零钱兑换](https://leetcode.cn/problems/coin-change/)🔥
 
 ```python
 class Solution(object):
@@ -671,7 +1022,7 @@ class Solution(object):
 
 
 
-### [279. 完全平方数](https://leetcode.cn/problems/perfect-squares/)
+### [279. 完全平方数](https://leetcode.cn/problems/perfect-squares/)🔥
 
 ```python
 class Solution(object):
@@ -696,7 +1047,7 @@ class Solution(object):
 
 
 
-### [139. 单词拆分](https://leetcode.cn/problems/word-break/)
+### [139. 单词拆分](https://leetcode.cn/problems/word-break/)🔥
 
 ```python
 class Solution(object):
@@ -729,7 +1080,7 @@ class Solution(object):
 
 
 
-### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)
+### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)🔥
 
 ```python
 class Solution(object):
@@ -754,7 +1105,7 @@ dp[i]表示i之前包括i的以nums[i]结尾的最长递增子序列的长度
 
 
 
-### [121. 买卖股票的最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)
+### [121. 买卖股票的最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)🔥
 
 ```python
 class Solution(object):
@@ -770,14 +1121,20 @@ class Solution(object):
         dp[0][0] = -prices[0]
         dp[0][1] = 0
         for i in range(1, length):
+            # 前1天就持有股票，保持；之前不持有股票，第i天购入股票
             dp[i][0] = max(dp[i-1][0], -prices[i])
+            # 前1天就不持有股票，保持；之前持有股票，第i天卖出股票
             dp[i][1] = max(dp[i-1][1], prices[i] + dp[i-1][0])
         return dp[-1][1]
 ```
 
+dp[i] [0]第i天持有股票最大值
+
+dp[i] [1]第i天不持有股票最大值
 
 
-### [53. 最大子数组和](https://leetcode.cn/problems/maximum-subarray/)
+
+### [53. 最大子数组和🔥](https://leetcode.cn/problems/maximum-subarray/)
 
 ```python
 class Solution(object):
@@ -799,7 +1156,7 @@ class Solution(object):
 
 
 
-### [152. 乘积最大子数组](https://leetcode.cn/problems/maximum-product-subarray/)
+### [152. 乘积最大子数组](https://leetcode.cn/problems/maximum-product-subarray/)🔥
 
 ```python
 class Solution(object):
@@ -950,7 +1307,7 @@ class MyLinkedList(object):
 
 
 
-### [19. 删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)
+### [19. 删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)🔥
 
 ```python
 # Definition for singly-linked list.
@@ -985,7 +1342,7 @@ class Solution(object):
 
 
 
-### [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)
+### [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)🔥
 
 ```python
 # Definition for singly-linked list.
@@ -1014,7 +1371,7 @@ class Solution(object):
 
 
 
-### [160. 相交链表](https://leetcode.cn/problems/intersection-of-two-linked-lists/)
+### [160. 相交链表🔥](https://leetcode.cn/problems/intersection-of-two-linked-lists/)
 
 ```python
 # Definition for singly-linked list.
@@ -1060,7 +1417,7 @@ class Solution(object):
 
 
 
-### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/)
+### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/)🔥
 
 ```python
 # Definition for singly-linked list.
@@ -1087,7 +1444,7 @@ class Solution(object):
 
 
 
-### [24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/)
+### [24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/)🔥
 
 ```python
 # Definition for singly-linked list.
@@ -1120,7 +1477,7 @@ class Solution(object):
 
 
 
-### [234. 回文链表](https://leetcode.cn/problems/palindrome-linked-list/)
+### [234. 回文链表](https://leetcode.cn/problems/palindrome-linked-list/)🔥
 
 ```python
 # Definition for singly-linked list.
@@ -1198,7 +1555,7 @@ class Solution(object):
 
 
 
-### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)
+### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)🔥
 
 ```python
 # Definition for singly-linked list.
@@ -1225,7 +1582,7 @@ class Solution(object):
 
 
 
-### [142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/)
+### [142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/)🔥
 
 ```python
 # Definition for singly-linked list.
@@ -1289,7 +1646,7 @@ class Solution(object):
 
 
 
-### [2. 两数相加](https://leetcode.cn/problems/add-two-numbers/)
+### [2. 两数相加](https://leetcode.cn/problems/add-two-numbers/)🔥
 
 ```python
 # Definition for singly-linked list.
@@ -1385,7 +1742,7 @@ class Solution(object):
 
 
 
-### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)
+### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)🔥
 
 ```python
 # Definition for a binary tree node.
@@ -1521,7 +1878,7 @@ class Solution(object):
 
 
 
-### [104. 二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)
+### [104. 二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)🔥
 
 ```python
 # Definition for a binary tree node.
@@ -1596,7 +1953,7 @@ class Solution(object):
 
 
 
-### [226. 翻转二叉树](https://leetcode.cn/problems/invert-binary-tree/)
+### [226. 翻转二叉树](https://leetcode.cn/problems/invert-binary-tree/)🔥
 
 ```python
 # Definition for a binary tree node.
@@ -1625,7 +1982,7 @@ class Solution(object):
 
 
 
-### [101. 对称二叉树](https://leetcode.cn/problems/symmetric-tree/)
+### [101. 对称二叉树](https://leetcode.cn/problems/symmetric-tree/)🔥
 
 ```python
 # Definition for a binary tree node.
@@ -1666,7 +2023,7 @@ class Solution(object):
 
 ## 技巧
 
-### [169. 多数元素](https://leetcode.cn/problems/majority-element/)
+### [169. 多数元素](https://leetcode.cn/problems/majority-element/)🔥
 
 ```python
 class Solution(object):
