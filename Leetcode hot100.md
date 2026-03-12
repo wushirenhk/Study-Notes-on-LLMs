@@ -423,7 +423,7 @@ class Solution(object):
 
 ## 回溯
 
-### [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)🔥
+### [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -471,7 +471,7 @@ class Solution(object):
 
 
 
-### [78. 子集](https://leetcode.cn/problems/subsets/)🔥
+### [78. 子集](https://leetcode.cn/problems/subsets/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -498,6 +498,131 @@ class Solution(object):
         self.backtracking(nums, 0, path, result)
 
         return result
+```
+
+
+
+### [39. 组合总和](https://leetcode.cn/problems/combination-sum/)🔥（中等）
+
+```python
+class Solution(object):
+    def backtracking(self, candidates, target, total, start_index, path, result):
+        if total > target:
+            return
+        if total == target:
+            result.append(path[:])
+            return
+            
+        for i in range(start_index, len(candidates)):
+            path.append(candidates[i])
+            total += candidates[i]
+            # 不用i+1了，表示可以重复读取当前的数
+            self.backtracking(candidates, target, total, i, path, result)
+            total -= candidates[i]
+            path.pop()
+
+    def combinationSum(self, candidates, target):
+        """
+        :type candidates: List[int]
+        :type target: int
+        :rtype: List[List[int]]
+        """
+        result = []
+        path = []
+        self.backtracking(candidates, target, 0, 0, path, result)
+        return result
+```
+
+
+
+### [131. 分割回文串](https://leetcode.cn/problems/palindrome-partitioning/)🔥（中等）
+
+```python
+class Solution(object):
+    def backtracking(self, s, start_index, path, result):
+        if start_index == len(s):
+            result.append(path[:])
+            return
+        
+        for i in range(start_index, len(s)):
+            # 判断是否回文
+            if s[start_index : i + 1] == s[start_index : i + 1][::-1]:
+                path.append(s[start_index : i + 1])
+                self.backtracking(s, i + 1, path, result)
+                path.pop()
+
+    def partition(self, s):
+        """
+        :type s: str
+        :rtype: List[List[str]]
+        """
+        result = []
+        path = []
+        self.backtracking(s, 0, path, result)
+        return result
+```
+
+当 `start_index == len(s)` 时，说明我们已经从字符串的起始位置（0）一直切割到了字符串的末尾（len (s)），意味着完成了一次**完整且有效的切割**（所有切割出的子串都是回文）
+
+此时需要把当前的切割路径（`path`）保存到结果集 `result` 中，然后终止当前递归分支
+
+
+
+### [51. N 皇后](https://leetcode.cn/problems/n-queens/)🔥（困难）
+
+```python
+class Solution(object):
+    def solveNQueens(self, n):
+        """
+        :type n: int
+        :rtype: List[List[str]]
+        """
+        result = []
+        chessboard = ['.' * n for _ in range(n)]
+        self.backtracking(n, 0, chessboard, result)
+        
+        final_result = []
+        for path in result:
+            current_board = []
+            for row in path:
+                # 将每行的字符列表转为字符串（如 ['.','Q','.','.'] → ".Q.."）
+                current_board.append(''.join(row))
+            final_result.append(current_board)
+
+        return final_result
+    
+    def backtracking(self, n, row, chessboard, result):
+        # row行 col列
+        if row == n:
+            result.append(chessboard[:])
+            return
+        
+        for col in range(n):
+            if self.isValid(row, col, chessboard):
+                chessboard[row] = chessboard[row][:col] + 'Q' + chessboard[row][col + 1 :]
+                self.backtracking(n, row + 1, chessboard, result)
+                chessboard[row] = chessboard[row][:col] + '.' + chessboard[row][col + 1 :]
+    
+    def isValid(self, row, col, chessboard):
+        for i in range(row):
+            if chessboard[i][col] == 'Q':
+                return False
+        
+        i, j = row - 1, col - 1
+        while i >= 0 and j >= 0:
+            if chessboard[i][j] == 'Q':
+                return False
+            i -= 1
+            j -= 1
+
+        i, j = row - 1, col + 1
+        while i >= 0 and j < len(chessboard):
+            if chessboard[i][j] == 'Q':
+                return False
+            i -= 1
+            j += 1
+
+        return True
 ```
 
 
@@ -591,7 +716,7 @@ class Solution(object):
 
 
 
-### [155. 最小栈](https://leetcode.cn/problems/min-stack/)🔥（一般）
+### [155. 最小栈](https://leetcode.cn/problems/min-stack/)🔥（中等）
 
 ```python
 class MinStack(object):
@@ -642,7 +767,7 @@ class MinStack(object):
 
 
 
-### [394. 字符串解码](https://leetcode.cn/problems/decode-string/)🔥（一般）
+### [394. 字符串解码](https://leetcode.cn/problems/decode-string/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -673,7 +798,7 @@ class Solution(object):
 
 
 
-### [739. 每日温度](https://leetcode.cn/problems/daily-temperatures/)🔥（一般）
+### [739. 每日温度](https://leetcode.cn/problems/daily-temperatures/)🔥（中等）
 
 ```python
 class Solution(object):
