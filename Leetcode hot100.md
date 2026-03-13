@@ -998,7 +998,7 @@ class Solution(object):
 
 ## 贪心算法
 
-### [55. 跳跃游戏](https://leetcode.cn/problems/jump-game/)🔥
+### [55. 跳跃游戏](https://leetcode.cn/problems/jump-game/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -1025,7 +1025,7 @@ class Solution(object):
 
 
 
-### [45. 跳跃游戏 II🔥](https://leetcode.cn/problems/jump-game-ii/)
+### [45. 跳跃游戏 II](https://leetcode.cn/problems/jump-game-ii/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -1053,7 +1053,7 @@ class Solution(object):
 
 
 
-### [763. 划分字母区间🔥](https://leetcode.cn/problems/partition-labels/)
+### [763. 划分字母区间](https://leetcode.cn/problems/partition-labels/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -1080,6 +1080,123 @@ class Solution(object):
         
         return res
 ```
+
+
+
+## 普通数组
+
+### [56. 合并区间](https://leetcode.cn/problems/merge-intervals/)🔥（中等）
+
+```python
+class Solution(object):
+    def merge(self, intervals):
+        """
+        :type intervals: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        result = []
+        if len(intervals) == 0:
+            return []
+        # 按照区间的左边界进行排序
+        intervals.sort(key=lambda x: x[0])
+
+        result.append(intervals[0])
+        for i in range(1, len(intervals)):
+            if intervals[i][0] <= result[-1][1]:
+                # 合并区间，只需要更新结果集最后一个区间的右边界，因为根据排序，左边界已经是最小的
+                result[-1][1] = max(result[-1][1], intervals[i][1])
+            else:
+                result.append(intervals[i])
+        
+        return result
+```
+
+本质上就是贪心算法，类似于55. 跳跃游戏
+
+
+
+### [189. 轮转数组](https://leetcode.cn/problems/rotate-array/)🔥（中等）
+
+```python
+class Solution(object):
+    def rotate(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        k = k % len(nums)  
+        nums[:] = nums[-k:] + nums[:-k]
+```
+
+这样会使用额外的空间
+
+```python
+class Solution(object):
+    def reverse(self, nums, i, j):
+        # i从数组开头向后遍历，j从数组结尾向前遍历
+        while i < j:
+            nums[i], nums[j] = nums[j], nums[i]
+            i += 1
+            j -= 1
+
+    def rotate(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        k = k % len(nums)
+        n = len(nums)
+        self.reverse(nums, 0, n - 1)
+        self.reverse(nums, 0, k - 1)
+        self.reverse(nums, k, n - 1)
+```
+
+- 时间复杂度：O(*n*)，其中 *n* 是 *nums* 的长度。
+- 空间复杂度：O(1)。
+
+1 2 3 4 5 6 7 k=3
+
+7 6 5 4 3 2 1 先反转整个数组
+
+5 6 7 4 3 2 1再反转前k个
+
+5 6 7 1 2 3 4反转后n-k个
+
+题解详见https://leetcode.cn/problems/rotate-array/solutions/2784427/tu-jie-yuan-di-zuo-fa-yi-tu-miao-dong-py-ryfv
+
+
+
+### [238. 除了自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/)🔥（中等）
+
+```python
+class Solution(object):
+    def productExceptSelf(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        n = len(nums)
+        left = [1] * n
+        right = [1] * n
+        result = [1] * n
+
+        # 求元素i的前缀
+        for i in range(1, n):
+            left[i] = left[i - 1] * nums[i - 1]
+
+        # 求元素i的后缀
+        for i in range(n - 2, -1, -1):
+            right[i] = right[i + 1] * nums[i + 1]
+
+        for i in range(n):
+            result[i] = left[i] * right[i]
+        
+        return result
+```
+
+题目要求**不要使用除法，**且在 `O(n)` 时间复杂度内完成此题
 
 
 
@@ -1335,7 +1452,7 @@ dp[i]表示i之前包括i的以nums[i]结尾的最长递增子序列的长度
 
 
 
-### [121. 买卖股票的最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)🔥
+### [121. 买卖股票的最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)🔥（简单）
 
 ```python
 class Solution(object):
