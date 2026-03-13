@@ -568,6 +568,111 @@ class Solution(object):
 
 
 
+### [46. 全排列](https://leetcode.cn/problems/permutations/)🔥（中等）
+
+```python
+class Solution(object):
+    def backtracking(self, nums, used, path, result):
+        if len(path) == len(nums):
+            result.append(path[:])
+            return
+
+        for i in range(len(nums)):
+            if used[i]:
+                continue
+            used[i] = True
+            path.append(nums[i])
+            self.backtracking(nums, used, path, result)
+            path.pop()
+            used[i] = False
+
+    def permute(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        used = [False] * len(nums)
+        path = []
+        result = []
+        self.backtracking(nums, used, path, result)
+        
+        return result
+```
+
+
+
+### [22. 括号生成](https://leetcode.cn/problems/generate-parentheses/)🔥（中等）
+
+```python
+class Solution:
+    def backtracking(self, n, left, right, path, result):
+        if left + right == 2 * n:
+            result.append(path[:])
+            return
+
+        if left < n:
+            path.append('(')
+            self.backtracking(n, left + 1, right, path, result)
+            path.pop()
+
+        if right < left:
+            path.append(')')
+            self.backtracking(n, left, right + 1, path, result)
+            path.pop()
+
+    def generateParenthesis(self, n: int) -> List[str]:
+        path = []
+        result = []
+        final_result = []
+        self.backtracking(n, 0, 0, path, result)
+        
+        for path in result:
+            temp = ""
+            for i in path:
+                temp = temp + i
+            final_result.append(temp)
+
+        return final_result        
+```
+
+
+
+### [79. 单词搜索](https://leetcode.cn/problems/word-search/)🔥（中等）
+
+```python
+class Solution(object):
+    def backtracking(self, board, word, i, j, index):
+        if i < 0 or i >= len(board):
+            return False
+        if j <0 or j >= len(board[0]):
+            return False
+        if board[i][j] != word[index]:
+            return False
+    
+        if index == len(word) - 1: 
+            return True
+        # 修改board的状态表明该网格已经被选择过
+        board[i][j] = ''
+        res = self.backtracking(board, word, i + 1, j, index + 1) or self.backtracking(board, word, i - 1, j, index + 1) or self.backtracking(board, word, i, j + 1, index + 1)or self.backtracking(board, word, i, j - 1, index + 1) 
+        board[i][j] = word[index]
+        return res
+
+
+    def exist(self, board, word):
+        """
+        :type board: List[List[str]]
+        :type word: str
+        :rtype: bool
+        """
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if self.backtracking(board, word, i, j, 0):
+                    return True
+        return False
+```
+
+
+
 ### [51. N 皇后](https://leetcode.cn/problems/n-queens/)🔥（困难）
 
 ```python
