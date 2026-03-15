@@ -732,6 +732,206 @@ class Solution(object):
 
 
 
+## 二分查找
+
+### [35. 搜索插入位置](https://leetcode.cn/problems/search-insert-position/)🔥（简单）
+
+请必须使用时间复杂度为 `O(log n)` 的算法。
+
+```python
+class Solution(object):
+    def searchInsert(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        left = 0
+        right = len(nums) - 1
+
+        while left <= right:
+            middle = left + (right - left) // 2
+            if nums[middle] == target:
+                return middle
+            elif nums[middle] < target:
+                left = middle + 1
+            elif nums[middle] > target:
+                right = middle - 1
+        return left
+```
+
+注意：二分查找middle值用
+
+middle = left + （right - left）// 2
+
+二分查找条件是while left <= right
+
+安全、通用、无溢出
+
+
+
+### [704. 二分查找](https://leetcode.cn/problems/binary-search/)
+
+```python
+class Solution(object):
+    def search(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        left = 0
+        right = len(nums) - 1
+
+        while left <= right:
+            middle = left + (right - left) // 2
+            if nums[middle] == target:
+                return middle
+            elif nums[middle] < target:
+                left = middle + 1
+            elif nums[middle] > target:
+                right = middle - 1
+        return -1
+```
+
+
+
+### [74. 搜索二维矩阵](https://leetcode.cn/problems/search-a-2d-matrix/)🔥（中等）
+
+```python
+class Solution(object):
+    def searchMatrix(self, matrix, target):
+        """
+        :type matrix: List[List[int]]
+        :type target: int
+        :rtype: bool
+        """
+        m = len(matrix)
+        n = len(matrix[0])
+        # 展开成虚拟一维数组
+        left = 0
+        right = m * n - 1
+
+        while left <= right:
+            middle = left + (right - left) // 2
+            row = middle // n
+            col = middle % n
+            if matrix[row][col] == target:
+                return True
+            elif matrix[row][col] < target:
+                left = middle + 1
+            elif matrix[row][col] > target:
+                right = middle - 1
+        return False
+```
+
+- 时间复杂度：*O*(log*mn*)，其中 *m* 和 *n* 分别是矩阵的行数和列数。
+
+- 空间复杂度：*O*(1)。
+
+  
+
+### [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/)🔥（中等）
+
+```python
+class Solution(object):
+    def searchRange(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        leftindex = self.binSearch(nums, target, True)
+        rightindex = self.binSearch(nums, target, False)
+        return [leftindex, rightindex]
+        
+    def binSearch(self, nums, target, isLeft):
+        left = 0
+        right = len(nums) - 1
+        index = -1
+
+        while left <= right:
+            middle = left + (right - left) // 2
+            if nums[middle] == target:
+                index = middle
+                if isLeft:
+                    right = middle - 1
+                else:
+                    left = middle + 1
+            elif nums[middle] < target:
+                left = middle + 1
+            elif nums[middle] > target:
+                right = middle - 1
+        
+        return index
+```
+
+
+
+### [33. 搜索旋转排序数组](https://leetcode.cn/problems/search-in-rotated-sorted-array/)🔥（中等）
+
+```python
+class Solution(object):
+    def search(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        left = 0
+        right = len(nums) - 1
+
+        while left <= right:
+            middle = (left + right) // 2
+            if nums[middle] == target:
+                return middle
+
+            if nums[left] <= nums[middle]:
+                if nums[left] <= target and target < nums[middle]:
+                    right = middle - 1
+                else:
+                    left = middle + 1
+            else:
+                if nums[middle] < target and target <= nums[right]:
+                    left = middle + 1
+                else:
+                    right = middle - 1
+        return -1
+```
+
+[【小白都能听懂的算法课】【力扣】【Leetcode33】搜索旋转排序数组 | 二分查找 | 数组_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1tz421r7xC/?spm_id_from=333.337.search-card.all.click&vd_source=9e77deab9cbf476a360f590847f021a1)
+
+将旋转排序后的数组分为四段进行讨论
+
+
+
+### [153. 寻找旋转排序数组中的最小值](https://leetcode.cn/problems/find-minimum-in-rotated-sorted-array/)🔥（中等）
+
+```python
+class Solution(object):
+    def findMin(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        left = 0
+        right = len(nums) - 1
+
+        # 注意这里是 < 不是 <=
+        while left < right:
+            middle = left + (right - left) // 2
+            if nums[middle] < nums[right]:
+                right = middle
+            else:
+                left = middle + 1
+        
+        return nums[left]
+```
+
+这道题难以理解，需要背答案
+
+
+
 ## 栈
 
 ### [232. 用栈实现队列](https://leetcode.cn/problems/implement-queue-using-stacks/)
