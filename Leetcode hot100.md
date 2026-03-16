@@ -826,10 +826,44 @@ class Solution(object):
 ```
 
 - 时间复杂度：*O*(log*mn*)，其中 *m* 和 *n* 分别是矩阵的行数和列数。
-
 - 空间复杂度：*O*(1)。
 
-  
+
+
+### [240. 搜索二维矩阵 II](https://leetcode.cn/problems/search-a-2d-matrix-ii/)🔥（中等）
+
+```python
+class Solution(object):
+    def searchMatrix(self, matrix, target):
+        """
+        :type matrix: List[List[int]]
+        :type target: int
+        :rtype: bool
+        """
+        for row in matrix:
+            if self.binSearch(row, target):
+                return True
+        return False
+
+    def binSearch(self, nums, target):
+        left = 0
+        right = len(nums) - 1
+
+        while left <= right:
+            middle = left + (right - left) // 2
+            if nums[middle] == target:
+                return True
+            elif nums[middle] < target:
+                left = middle + 1
+            elif nums[middle] > target:
+                right = middle - 1
+        return False
+```
+
+- 时间复杂度：*O*(*m*log*n*)。对一行使用二分查找的时间复杂度为 *O*(log*n*)，最多需要进行 *m* 次二分查找。
+- 空间复杂度：*O*(1)。
+
+
 
 ### [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/)🔥（中等）
 
@@ -1397,6 +1431,144 @@ class Solution(object):
 ```
 
 题目要求**不要使用除法，**且在 `O(n)` 时间复杂度内完成此题
+
+
+
+## 矩阵
+
+### [73. 矩阵置零](https://leetcode.cn/problems/set-matrix-zeroes/)🔥（中等）
+
+```python
+class Solution(object):
+    def setZeroes(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: None Do not return anything, modify matrix in-place instead.
+        """
+        m = len(matrix)
+        n = len(matrix[0])
+        row = [False] * m
+        col = [False] * n
+
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == 0:
+                    row[i] = True
+                    col[j] = True
+        
+        for i in range(m):
+            for j in range(n):
+                if row[i] or col[j]:
+                    matrix[i][j] = 0
+```
+
+
+
+### [48. 旋转图像](https://leetcode.cn/problems/rotate-image/)🔥（中等）
+
+你必须在**[ 原地](https://baike.baidu.com/item/原地算法)** 旋转图像，这意味着你需要直接修改输入的二维矩阵。**请不要** 使用另一个矩阵来旋转图像。
+
+```python
+class Solution(object):
+    def rotate(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: None Do not return anything, modify matrix in-place instead.
+        """
+        n = len(matrix)
+        # 水平翻转
+        for i in range(n // 2):
+            for j in range(n):
+                matrix[i][j], matrix[n - i - 1][j] = matrix[n - i - 1][j], matrix[i][j]
+
+        # 对角线翻转
+        for i in range(n):
+            for j in range(i):
+                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+```
+
+1.先水平翻转
+$$
+\begin{bmatrix}
+5 & 1 & 9 & 11 \\
+2 & 4 & 8 & 10 \\
+13 & 3 & 6 & 7 \\
+15 & 14 & 12 & 16
+\end{bmatrix}
+\xrightarrow{\text{水平翻转}}
+\begin{bmatrix}
+15 & 14 & 12 & 16 \\
+13 & 3 & 6 & 7 \\
+2 & 4 & 8 & 10 \\
+5 & 1 & 9 & 11
+\end{bmatrix}
+$$
+2.再对角线翻转
+$$
+\begin{bmatrix}
+15 & 14 & 12 & 16 \\
+13 & 3 & 6 & 7 \\
+2 & 4 & 8 & 10 \\
+5 & 1 & 9 & 11
+\end{bmatrix}
+\xrightarrow{\text{主对角线翻转}}
+\begin{bmatrix}
+15 & 13 & 2 & 5 \\
+14 & 3 & 4 & 1 \\
+12 & 6 & 8 & 9 \\
+16 & 7 & 10 & 11
+\end{bmatrix}
+$$
+
+
+### [54. 螺旋矩阵](https://leetcode.cn/problems/spiral-matrix/)🔥（中等）
+
+```python
+class Solution(object):
+    def spiralOrder(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: List[int]
+        """
+        m = len(matrix)
+        n = len(matrix[0])
+        left, right, up, down = 0, n - 1, 0, m - 1
+        res = []
+
+        while len(res) < m * n:
+            # 向右走
+            for i in range(left, right + 1):
+                if len(res) == m * n:
+                    return res
+                res.append(matrix[up][i]) 
+            up += 1
+
+            # 向下走
+            for i in range(up, down + 1):
+                if len(res) == m * n:
+                    return res
+                res.append(matrix[i][right]) 
+            right -= 1
+
+             # 向左走
+            for i in range(right, left - 1, -1):
+                if len(res) == m * n:
+                    return res
+                res.append(matrix[down][i]) 
+            down -= 1
+
+            
+             # 向上走
+            for i in range(down, up - 1, -1):
+                if len(res) == m * n:
+                    return res
+                res.append(matrix[i][left]) 
+            left += 1
+
+        return res
+```
+
+依次按顺序模拟右下左上
 
 
 
@@ -2568,9 +2740,54 @@ class Solution(object):
 
 
 
+## 图论
+
+### [200. 岛屿数量](https://leetcode.cn/problems/number-of-islands/)🔥（中等）
+
+```python
+class Solution(object):
+    # 四个方向：上、右、下、左
+    direction = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+
+    def numIslands(self, grid):
+        """
+        :type grid: List[List[str]]
+        :rtype: int
+        """
+        res = 0
+        m = len(grid)
+        n = len(grid[0])
+        visited = [[False] * n for _ in range(m)]
+
+        for i in range(m):
+            for j in range(n):
+                # 判断：如果当前节点是陆地，res+1并标记访问该节点，使用深度搜索标记相邻陆地。
+                if grid[i][j] == "1" and visited[i][j] == False:
+                    res += 1
+                    self.dfs(grid, visited, i, j)
+
+        return res
+    
+    def dfs(self, grid, visited, x, y):
+        if visited[x][y] == True or grid[x][y] == "0":
+            return
+
+        visited[x][y] = True
+
+        for i, j in self.direction:
+            next_x = x + i
+            next_y = y + j
+            if next_x < 0 or next_x >= len(grid) or next_y < 0 or next_y >= len(grid[0]):
+                continue
+
+            self.dfs(grid, visited, next_x, next_y)
+```
+
+
+
 ## 技巧
 
-### [169. 多数元素](https://leetcode.cn/problems/majority-element/)🔥
+### [169. 多数元素](https://leetcode.cn/problems/majority-element/)🔥（简单）
 
 ```python
 class Solution(object):
@@ -2585,3 +2802,46 @@ class Solution(object):
 ```
 
 如果将数组 `nums` 中的所有元素按照单调递增或单调递减的顺序排序，那么下标为 ⌊n/2⌋ 的元素（下标从 `0` 开始）一定是众数。
+
+
+
+### [31. 下一个排列](https://leetcode.cn/problems/next-permutation/)🔥（中等）
+
+必须**[ 原地 ](https://baike.baidu.com/item/原地算法)**修改，只允许使用额外常数空间。
+
+```python
+class Solution(object):
+    def nextPermutation(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        # 第一步：从后往前找 第一个 变小的位置 i
+        # 也就是找 nums[i] < nums[i+1]
+        i = len(nums) - 2  # 从倒数第二个开始，避免 i+1 越界
+
+        # 只要当前数 >= 后面的数，就继续往前找
+        while i >= 0 and nums[i] >= nums[i + 1]:
+            i -= 1
+        
+        # 第二步：如果找到了 i（不是完全降序）
+        if i >= 0:
+            # 从后往前找 第一个 比 nums[i] 大的数 j
+            j = len(nums) - 1
+            while j >= 0 and nums[i] >= nums[j]:
+                j -= 1
+            # 交换 i 和 j，让前面的数刚好变大一点点
+            nums[i], nums[j] = nums[j], nums[i]
+
+        # 第三步：把 i 后面的所有数 反转
+        # 因为 i 后面一定是降序，反转后变成升序（最小）
+        left = i + 1
+        right = len(nums) - 1
+        while left < right:
+            # 交换左右指针，实现反转
+            nums[left], nums[right] = nums[right], nums[left]
+            left += 1
+            right -= 1
+```
+
+难以理解，直接背诵
