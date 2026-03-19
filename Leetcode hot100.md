@@ -2226,6 +2226,44 @@ len（word1）+1 和 len（word2）+ 1是为了第一行第一列的空字符串
 
 
 
+### [1143. 最长公共子序列](https://leetcode.cn/problems/longest-common-subsequence/)🔥（中等）
+
+```python
+class Solution(object):
+    def longestCommonSubsequence(self, text1, text2):
+        """
+        :type text1: str
+        :type text2: str
+        :rtype: int
+        """
+    # 创建 DP 表：(len(text1)+1)行 × (len(text2)+1)列
+    # dp[i][j] 表示：text1前i个字符 和 text2前j个字符 的最长公共子序列长度
+    # +1 是为了包含 空字符串 的情况（第0行、第0列）
+    dp = [[0] * (len(text2) + 1) for _ in range(len(text1) + 1)]
+
+    # 遍历填充 DP 表
+    for i in range(1, len(text1) + 1):
+        for j in range(1, len(text2) + 1):
+            # 如果当前字符相等（注意字符串从0开始，所以用i-1/j-1）
+            if text1[i - 1] == text2[j - 1]:
+                # 相等 → 公共长度 = 左上角值 + 1（两个字符串同时往前挪一位）
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                # 不相等 → 取两种情况最大值：
+                # 1. 舍弃 text1 当前字符：dp[i-1][j]
+                # 2. 舍弃 text2 当前字符：dp[i][j-1]
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    
+    # 右下角的值就是整个 text1 和 text2 的最长公共子序列长度
+    return dp[-1][-1]
+```
+
+有点类似72. 编辑距离
+
+dp【i】【j】：长度为[0, i - 1]的字符串text1与长度为[0, j - 1]的字符串text2的最长公共子序列为dp【i】【j】
+
+
+
 ## 链表
 
 ### [203. 移除链表元素](https://leetcode.cn/problems/remove-linked-list-elements/)
@@ -2748,10 +2786,6 @@ class Solution(object):
 
 前序遍历：中左右
 
-中序遍历：左中右
-
-后序遍历：左右中
-
 ### [144. 二叉树的前序遍历](https://leetcode.cn/problems/binary-tree-preorder-traversal/)
 
 ```python
@@ -2784,7 +2818,7 @@ class Solution(object):
 
 
 
-### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)🔥
+### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)🔥（简单）
 
 ```python
 # Definition for a binary tree node.
@@ -2813,6 +2847,8 @@ class Solution(object):
 
         return res
 ```
+
+中序遍历：左中右
 
 
 
@@ -2846,9 +2882,132 @@ class Solution(object):
         return res
 ```
 
+后序遍历：左右中
 
 
-### [114. 二叉树展开为链表](https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/)
+
+### 知识：二叉搜索树BST
+
+**有效** 二叉搜索树定义如下：
+
+- 节点的左子树只包含 **严格小于** 当前节点的数。
+- 节点的右子树只包含 **严格大于** 当前节点的数。
+- 所有左子树和右子树自身必须也是二叉搜索树。
+- 二叉搜索树的中序遍历是**严格递增**序列
+
+
+
+### [98. 验证二叉搜索树](https://leetcode.cn/problems/validate-binary-search-tree/)🔥（中等）
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def isValidBST(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: bool
+        """
+        def dfs(node, vec):
+            if node is None:
+                return
+            # 中序遍历，将二叉搜索树转换为有序数组
+            dfs(node.left, self.vec)
+            self.vec.append(node.val)
+            dfs(node.right, self.vec)
+
+        self.vec = []
+        dfs(root, self.vec)
+        for i in range(0, len(self.vec) - 1):
+            #注意要大于等于，搜索树里不能有相同元素
+            if self.vec[i] >= self.vec[i + 1]:
+                return False
+            
+        return True
+```
+
+DFS，二叉搜索树（BST）的中序遍历结果一定是「严格递增数组」
+
+
+
+### [108. 将有序数组转换为二叉搜索树](https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/)🔥（简单）
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def sortedArrayToBST(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: Optional[TreeNode]
+        """
+        def dfs(nums, left, right):
+            # 定义函数在nums上[left, right]左闭右闭区间内寻找根节点
+            if left > right:
+                return
+            
+            # 核心永远选区间中间的数作为根节点，递归构建左右子树
+            mid = left + (right - left) // 2
+            root = TreeNode(nums[mid])
+            root.left = dfs(nums, left, mid - 1)
+            root.right = dfs(nums, mid + 1, right)
+            return root
+
+        root = dfs(nums, 0, len(nums) - 1)
+        return root
+```
+
+DFS，构建二叉搜索树永远选区间中间的数作为根节点，递归构建左右子树
+
+
+
+### [230. 二叉搜索树中第 K 小的元素](https://leetcode.cn/problems/kth-smallest-element-in-a-bst/)🔥（中等）
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def kthSmallest(self, root, k):
+        """
+        :type root: Optional[TreeNode]
+        :type k: int
+        :rtype: int
+        """
+        self.res = 0
+        self.count = 0
+
+        def dfs(node):
+            if node is None:
+                return
+            
+            dfs(node.left)
+            self.count += 1
+            if self.count == k:
+                self.res = node.val
+                return
+            dfs(node.right)
+        
+        dfs(root)
+        return self.res
+```
+
+DFS，二叉搜索树的中序遍历为严格递增序列
+
+
+
+### [114. 二叉树展开为链表](https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/)🔥（中等）
 
 ```python
 # Definition for a binary tree node.
@@ -2882,9 +3041,97 @@ class Solution(object):
 
 
 
+### [543. 二叉树的直径](https://leetcode.cn/problems/diameter-of-binary-tree/)🔥（简单）
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def diameterOfBinaryTree(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: int
+        """
+
+        def dfs(node, res, height):
+            if node is None:
+                return 0
+            left_height = 0
+            L_depth = dfs(node.left, res, left_height)
+            right_height = 0
+            R_depth = dfs(node.right, res, right_height)
+            self.res = max(self.res, L_depth + R_depth)
+            # 递归返回给父节点时，必须把自己算进去，父节点才能算出正确高度
+            return max(L_depth, R_depth) + 1
+        
+        self.res = 0
+        height = 0
+        dfs(root, self.res, height)
+        return self.res
+```
+
+任意节点的【左子树高度 + 右子树高度】的最大值
+
+
+
+### [236. 二叉树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/)🔥（中等）
+
+最近公共祖先的定义为：“对于有根树 T 的两个节点 p、q，最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（**一个节点也可以是它自己的祖先**）。”
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+        # 递归终止条件：
+        # 1. 走到空节点，返回 None
+        # 2. 当前节点就是 p 或 q，直接返回当前节点（找到了）
+        if root is None or root == p or root == q:
+            return root
+
+        # 递归去左子树找 p 和 q
+        left = self.lowestCommonAncestor(root.left, p, q)
+        # 递归去右子树找 p 和 q
+        right = self.lowestCommonAncestor(root.right, p, q)
+
+        # 情况1：左边没找到，右边找到了 → 答案就是右边
+        if left is None and right is not None:
+            return right
+        # 情况2：右边没找到，左边找到了 → 答案就是左边
+        elif left is not None and right is None:
+            return left
+        # 情况3：左右都没找到 → 返回空
+        elif left is None and right is None:
+            return None
+        # 情况4：左右两边都找到了 → 当前节点就是最近公共祖先！
+        elif left is not None and right is not None:
+            return root
+```
+
+DFS，采用后序遍历（左→右→根），自底向上找最近公共祖先：
+
+如果一个节点的左边找到 p、右边找到 q，那它就是答案！
+
+
+
 ## 二叉树BFS
 
-### [102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tree-level-order-traversal/)
+### [102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tree-level-order-traversal/)🔥（中等）
 
 ```python
 # Definition for a binary tree node.
@@ -2918,9 +3165,11 @@ class Solution(object):
         return res
 ```
 
+BFS
 
 
-### [104. 二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)🔥
+
+### [104. 二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)🔥（简单）
 
 ```python
 # Definition for a binary tree node.
@@ -2995,7 +3244,7 @@ class Solution(object):
 
 
 
-### [226. 翻转二叉树](https://leetcode.cn/problems/invert-binary-tree/)🔥
+### [226. 翻转二叉树](https://leetcode.cn/problems/invert-binary-tree/)🔥（简单）
 
 ```python
 # Definition for a binary tree node.
@@ -3024,7 +3273,7 @@ class Solution(object):
 
 
 
-### [101. 对称二叉树](https://leetcode.cn/problems/symmetric-tree/)🔥
+### [101. 对称二叉树](https://leetcode.cn/problems/symmetric-tree/)🔥（简单）
 
 ```python
 # Definition for a binary tree node.
@@ -3060,6 +3309,44 @@ class Solution(object):
         
         return True
 ```
+
+
+
+### [199. 二叉树的右视图](https://leetcode.cn/problems/binary-tree-right-side-view/)🔥（中等）
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def rightSideView(self, root):
+        """
+        :type root: Optional[TreeNode]
+        :rtype: List[int]
+        """
+        if root is None:
+            return []
+
+        queue = collections.deque([root])
+        res = []
+        while queue:
+            level = []
+            for i in range(len(queue)):
+                current = queue.popleft()
+                level.append(current.val)
+                if current.left:
+                    queue.append(current.left)
+                if current.right:
+                    queue.append(current.right)
+            res.append(level[-1])
+        
+        return res
+```
+
+BFS，和[102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tree-level-order-traversal/)几乎完全一致，res中保存level的最后一个元素即可
 
 
 
