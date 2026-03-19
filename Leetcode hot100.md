@@ -1045,12 +1045,49 @@ class Solution(object):
             elif item == '{':
                 stack.append('}')
             # 注意要先判断栈是否为空，再判断栈顶元素是否和当前元素相等
+            # 右括号必须匹配栈顶，否则直接不合格！
             elif not stack or stack[-1] != item:
                 return False
             else:
                 stack.pop()
             
         return True if not stack else False
+```
+
+
+
+### [32. 最长有效括号](https://leetcode.cn/problems/longest-valid-parentheses/)🔥（困难）
+
+```python
+class Solution(object):
+    def longestValidParentheses(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        stack = [] 
+        mark = [False] * len(s)
+
+        for i in range(len(s)):
+            if s[i] == '(':
+                # 栈里只存左括号 ( 的下标
+                stack.append(i)
+            # 只要栈是非空的，就是合法匹配，非法的括号直接跳过去了
+            elif stack:
+                mark[stack[-1]] =  True
+                mark[i] = True
+                stack.pop()
+        
+        temp = 0
+        res = 0
+        for i in range(len(mark)):
+            if mark[i]:
+                temp += 1
+                res = max(res, temp)
+            else:
+                temp = 0
+
+        return res
 ```
 
 
@@ -1230,6 +1267,34 @@ class Solution(object):
 
 
 
+### 知识：queue（列表模拟）和 deque（双端队列）
+
+**列表 list = 栈（后进先出）**
+
+**deque = 队列（先进先出）**
+
+queue = [] 
+
+queue.pop()  
+
+删最后一个 → 栈 → DFS（深度优先）
+
+
+
+q = collections.deque()
+
+q.popleft()  # 删第一个 → 队列 → BFS（广度优先）
+
+| 方式      | 命令      | 结构 | 适合   |
+| --------- | --------- | ---- | ------ |
+| 列表 list | pop()     | 栈   | DFS    |
+| 列表 list | pop(0)    | 队列 | 小数据 |
+| deque     | popleft() | 队列 | BFS    |
+
+有时可以用[] + pop(0)模拟队列，但是list.pop(0) → 慢到爆炸 O (n) deque.popleft() → 飞快 O (1)
+
+
+
 ## 贪心算法
 
 ### [55. 跳跃游戏](https://leetcode.cn/problems/jump-game/)🔥（中等）
@@ -1404,6 +1469,8 @@ class Solution(object):
 
 ### [238. 除了自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/)🔥（中等）
 
+**题目要求不要使用除法，且在 `O(n)` 时间复杂度内完成此题**
+
 ```python
 class Solution(object):
     def productExceptSelf(self, nums):
@@ -1430,7 +1497,32 @@ class Solution(object):
         return result
 ```
 
-题目要求**不要使用除法，**且在 `O(n)` 时间复杂度内完成此题
+
+
+### [41. 缺失的第一个正数](https://leetcode.cn/problems/first-missing-positive/)🔥（困难）
+
+**请你实现时间复杂度为 `O(n)` 并且只使用常数级别额外空间的解决方案。**
+
+```python
+class Solution(object):
+    def firstMissingPositive(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        n = len(nums)
+        for i in range(n):
+            while 1 <= nums[i] <= n and nums[i] != nums[nums[i] - 1]:
+                # 原地哈希交换：必须先换目标位置，再换 i 位置！
+                # 如果写成 nums[i], nums[nums[i] - 1] = nums[nums[i] - 1], nums[i]会超时
+                nums[nums[i] - 1], nums[i] = nums[i], nums[nums[i] - 1]
+        
+        for i in range(n):
+            if nums[i] != i + 1:
+                return i + 1
+        
+        return n + 1
+```
 
 
 
@@ -1708,6 +1800,8 @@ class Solution(object):
 
 
 
+
+
 ### [322. 零钱兑换](https://leetcode.cn/problems/coin-change/)🔥
 
 ```python
@@ -1900,6 +1994,235 @@ class Solution(object):
 类似53. 最大子数组和，我们可以根据正负性进行分类讨论。
 
 考虑当前位置如果是一个负数的话，那么我们希望以它前一个位置结尾的某个段的积也是个负数，这样就可以负负得正，并且我们希望这个积尽可能「负得更多」，即尽可能小。如果当前位置是一个正数的话，我们更希望以它前一个位置结尾的某个段的积也是个正数，并且希望它尽可能地大。
+
+
+
+## 多维动态规划
+
+### [62. 不同路径](https://leetcode.cn/problems/unique-paths/)🔥（中等）
+
+```python
+class Solution(object):
+    def uniquePaths(self, m, n):
+        """
+        :type m: int
+        :type n: int
+        :rtype: int
+        """
+        dp = [[0] * n for i in range(m)]
+
+        # 初始化dp数组，让第一列和第一行的路径数均为1
+        for i in range(m):
+            dp[i][0] =  1
+        for j in range(n):
+            dp[0][j] = 1
+
+        for i in range(1, m):
+            for j in range(1, n):
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
+        
+        return dp[m - 1][n - 1]
+```
+
+dp【i】【j】 ：表示从（0 ，0）出发，到(i, j) 有dp【i】【j】条不同的路径。
+
+
+
+### [63. 不同路径 II](https://leetcode.cn/problems/unique-paths-ii/)（中等）
+
+```python
+class Solution(object):
+    def uniquePathsWithObstacles(self, obstacleGrid):
+        """
+        :type obstacleGrid: List[List[int]]
+        :rtype: int
+        """
+        m = len(obstacleGrid)
+        n = len(obstacleGrid[0])
+
+        dp = [[0] * n for i in range(m)]
+
+        if obstacleGrid[0][0] == 1 or obstacleGrid[m - 1][n - 1] == 1:
+            return 0
+        
+        for i in range(m):
+            if obstacleGrid[i][0] == 0:
+                dp[i][0] = 1
+            else:
+                break
+        
+        for j in range(n):
+            if obstacleGrid[0][j] == 0:
+                dp[0][j] = 1
+            else:
+                break
+        
+        for i in range(1, m):
+            for j in range(1, n):
+                if obstacleGrid[i][j] == 1:
+                    continue
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
+
+        return dp[m - 1][n - 1] 
+```
+
+dp【i】【j】 ：表示从（0 ，0）出发，到(i, j) 有dp【i】【j】条不同的路径。
+
+
+
+### [64. 最小路径和](https://leetcode.cn/problems/minimum-path-sum/)🔥（中等）
+
+```python
+class Solution(object):
+    def minPathSum(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        """
+        m = len(grid)
+        n = len(grid[0])
+
+        dp = [[0] * n for i in range(m)]
+
+        temp_m = 0
+        for i in range(m):
+            temp_m += grid[i][0]
+            dp[i][0] = temp_m 
+        
+        temp_n = 0
+        for j in range(n):
+            temp_n += grid[0][j]
+            dp[0][j] = temp_n
+
+        for i in range(1, m):
+            for j in range(1, n): 
+                dp[i][j] = min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j]
+        
+        return dp[m - 1][n - 1]
+```
+
+dp【i】【j】表示从（0 ，0）出发，到坐标（i，j）路径上的数字总和的最小值为dp【i】【j】
+
+
+
+### [647. 回文子串](https://leetcode.cn/problems/palindromic-substrings/)（中等）
+
+```python
+class Solution(object):
+    def countSubstrings(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        dp = [[False] * len(s) for _ in range(len(s))]
+        result = 0
+
+        for i in range(len(s)-1, -1, -1): #注意遍历顺序
+            for j in range(i, len(s)):
+                if s[i] == s[j]:
+                    if j - i <= 1: #情况一 和 情况二
+                        result += 1
+                        dp[i][j] = True
+                    elif dp[i+1][j-1]: #情况三
+                        result += 1
+                        dp[i][j] = True
+                        
+        return result
+```
+
+dp【i】【j】：表示区间范围[i,j] （注意是左闭右闭）的子串是否是回文子串，如果是dp【i】【j】为true，否则为false
+
+- 情况一：下标i 与 j相同，同一个字符例如a，当然是回文子串
+- 情况二：下标i 与 j相差为1，例如aa，也是回文子串
+- 情况三：下标：i 与 j相差大于1的时候，例如cabac，此时s[i]与s[j]已经相同了，我们看i到j区间是不是回文子串就看aba是不是回文就可以了，那么aba的区间就是 i+1 与 j-1区间，这个区间是不是回文就看dp[i + 1][j - 1]是否为true。
+
+
+
+### [5. 最长回文子串](https://leetcode.cn/problems/longest-palindromic-substring/)🔥（中等）
+
+```python
+class Solution(object):
+    def longestPalindrome(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        dp = [[False] * len(s) for _ in range(len(s))]
+        result = ""
+        index_i = 0
+        index_j = 0
+
+        for i in range(len(s)-1, -1, -1): #注意遍历顺序
+            for j in range(i, len(s)):
+                if s[i] == s[j]:
+                    if j - i <= 1: #情况一 和 情况二
+                        dp[i][j] = True
+                        if j - i > index_j - index_i:
+                            index_j = j
+                            index_i = i
+                    elif dp[i + 1][j - 1]: #情况三
+                        dp[i][j] = True
+                        if j - i > index_j - index_i:
+                            index_j = j
+                            index_i = i
+        
+        for i in range(index_i, index_j + 1):
+            result += s[i]
+                        
+        return result
+```
+
+dp【i】【j】：表示区间范围[i,j] （注意是左闭右闭）的子串是否是回文子串，如果是dp【i】【j】为true，否则为false
+
+
+
+### [72. 编辑距离](https://leetcode.cn/problems/edit-distance/)🔥（中等）
+
+```python
+class Solution(object):
+    def minDistance(self, word1, word2):
+        """
+        :type word1: str
+        :type word2: str
+        :rtype: int
+        """
+        # 创建 DP 表
+        # dp[i][j] 表示：把 word1 的前 i 个字符 → 变成 word2 的前 j 个字符，最少需要几步
+        # +1 是为了预留 空字符串 的位置（第0行、第0列）
+        dp = [[0] * (len(word2) + 1) for _ in range(len(word1) + 1)]
+
+        # 初始化第一列：word2 为空，把 word1 前 i 个字符删光 → 需要 i 步
+        for i in range(len(word1) + 1):
+            dp[i][0] = i
+
+        # 初始化第一行：word1 为空，变成 word2 前 j 个字符 → 需要加 j 个字符
+        for j in range(len(word2) + 1):
+            dp[0][j] = j
+
+        # 开始填 DP 表
+        for i in range(1, len(word1) + 1):
+            for j in range(1, len(word2) + 1):
+                # 如果当前两个字符相等 → 不用操作，直接继承左上角的值
+                if word1[i - 1] == word2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1]
+                # 如果字符不相等 → 三种操作选最小的：
+                # 1. dp[i-1][j]+1   删除 word1 的第 i 个字符
+                # 2. dp[i][j-1]+1   在 word1 中插入字符
+                # 3. dp[i-1][j-1]+1 替换字符
+                else:
+                    dp[i][j] = min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + 1)
+        
+        # 右下角就是最终答案：把整个 word1 → word2 的最小步数
+        return dp[-1][-1]
+```
+
+dp【i】【j】:表示以下标i-1为结尾的字符串word1，和以下标为j-1为结尾的字符串word2，最近的编辑距离为dp【i】【j】。
+
+len（word1）+1 和 len（word2）+ 1是为了第一行第一列的空字符串留空间
+
+第 0 行（空字符串）
+
+第 0 列（空字符串）
 
 
 
@@ -2782,6 +3105,161 @@ class Solution(object):
 
             self.dfs(grid, visited, next_x, next_y)
 ```
+
+
+
+### [994. 腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/)🔥（中等）
+
+```python
+class Solution(object):
+    def orangesRotting(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        """
+        queue = collections.deque()
+        # queue = []
+        time = 0
+        fresh = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 1:
+                    fresh += 1
+                # 将腐烂橘子的坐标放到队列里
+                elif grid[i][j] == 2:
+                    queue.append((i, j))
+        
+        direction = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+
+        while queue and fresh > 0:
+            for i in range(len(queue)):
+                current = queue.popleft()
+                # current = queue.pop(0)
+                # 遍历腐烂橘子的四个方向
+                for p, q in direction:
+                    current_x = current[0] + p
+                    current_y = current[1] + q
+
+                    if current_x < 0 or current_x >= len(grid) or current_y < 0 or current_y >= len(grid[0]) or grid[current_x][current_y] != 1:
+                        continue
+                    # 将周围新鲜橘子腐烂，将坐标加入队列
+                    grid[current_x][current_y] = 2
+                    queue.append((current_x, current_y))
+                    fresh -= 1
+            time += 1
+        
+        if fresh != 0:
+            return -1
+        else:
+            return time
+```
+
+BFS
+
+
+
+### [207. 课程表](https://leetcode.cn/problems/course-schedule/)🔥（中等）
+
+```python
+class Solution(object):
+    def canFinish(self, numCourses, prerequisites):
+        """
+        :type numCourses: int
+        :type prerequisites: List[List[int]]
+        :rtype: bool
+        """
+        inDegree = [0] * numCourses
+        umap = collections.defaultdict(list)
+
+        # info[1] = 先修课 info[0] = 后修课
+        # umap[先修课].append(后修课)
+        for info in prerequisites:
+            umap[info[1]].append(info[0])
+            inDegree[info[0]] += 1
+
+        q = collections.deque([i for i in range(numCourses) if inDegree[i] == 0])
+        visited = 0  # 记录已经学完的课程数量
+
+        while q:
+            current = q.popleft()   # 拿出一门可以学的课
+            visited += 1            # 学完了！计数+1
+
+            # 学完 current 课后，它的所有后续课 先修要求-1
+            for i in umap[current]:
+                inDegree[i] -= 1
+
+                # 如果这门课 先修课都学完了（入度=0），可以学了
+                if inDegree[i] == 0:
+                    q.append(i)
+        
+        return visited == numCourses
+```
+
+BFS找有向图是否成环
+
+
+
+### [208. 实现 Trie (前缀树)](https://leetcode.cn/problems/implement-trie-prefix-tree/)🔥（中等）
+
+```python
+class Trie(object):
+
+    def __init__(self):
+        self.children = [None] * 26
+        self.isEnd = False
+        
+
+    def insert(self, word):
+        """
+        :type word: str
+        :rtype: None
+        """
+        node = self
+        for ch in word:
+            ch = ord(ch) - ord("a")
+            if not node.children[ch]:
+                node.children[ch] =  Trie()
+            node = node.children[ch]
+        node.isEnd = True
+
+    def search(self, word):
+        """
+        :type word: str
+        :rtype: bool
+        """
+        node = self
+        for ch in word:
+            ch = ord(ch) - ord("a")
+            if not node.children[ch]:
+                return False
+            node = node.children[ch]
+        if node.isEnd == True:
+            return True
+        else:
+            return False
+
+    def startsWith(self, prefix):
+        """
+        :type prefix: str
+        :rtype: bool
+        """
+        node = self
+        for ch in prefix:
+            ch = ord(ch) - ord("a")
+            if not node.children[ch]:
+                return False
+            node = node.children[ch]
+        return True
+        
+
+# Your Trie object will be instantiated and called as such:
+# obj = Trie()
+# obj.insert(word)
+# param_2 = obj.search(word)
+# param_3 = obj.startsWith(prefix)
+```
+
+https://www.bilibili.com/video/BV1wsCJY6ESK/?spm_id_from=333.337.search-card.all.click
 
 
 
