@@ -966,6 +966,85 @@ class Solution(object):
 
 
 
+### [4. 寻找两个正序数组的中位数](https://leetcode.cn/problems/median-of-two-sorted-arrays/)🔥（困难）
+
+算法的时间复杂度应该为 `O(log (m+n))`
+
+```python
+class Solution(object):
+    def findMedianSortedArrays(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: float
+        """
+        # 确保 nums1 是较短的数组，减少二分次数，同时防止 j 越界
+        if len(nums2) < len(nums1):
+            nums1, nums2 = nums2, nums1
+        
+        m, n = len(nums1), len(nums2)
+        # 二分查找的左右边界，在 nums1 上找切分点 i
+        left, right = 0, m
+
+        while left <= right:
+            # 计算 nums1 的切分点 i，防止溢出写法
+            i = left + (right - left) // 2
+            # 根据总长度计算 nums2 的切分点 j，保证左右两部分总元素相等
+            j = (m + n + 1) // 2 - i
+            
+            # ---------- 处理四个边界值 ----------
+            # nums1 左半部分的最大值，i=0 表示 nums1 左半无元素，设为负无穷
+            if i > 0:
+                left1 = nums1[i - 1]
+            else:
+                left1 = float('-inf')
+            
+            # nums1 右半部分的最小值，i=m 表示 nums1 右半无元素，设为正无穷
+            if i < m:
+                right1 = nums1[i]
+            else:
+                right1 = float('inf')
+            
+            # nums2 左半部分的最大值，j=0 表示 nums2 左半无元素，设为负无穷
+            if j > 0:
+                left2 = nums2[j - 1]
+            else:
+                left2 = float('-inf')
+            
+            # nums2 右半部分的最小值，j=n 表示 nums2 右半无元素，设为正无穷
+            if j < n:
+                right2 = nums2[j]
+            else:
+                right2 = float('inf')
+            
+            # ---------- 核心判断：找到正确切分 ----------
+            # 满足左边所有数 <= 右边所有数，切分合法
+            if left1 <= right2 and left2 <= right1:
+                # 总长度奇数：中位数 = 左半部分最大值
+                if (m + n) % 2 == 1:
+                    return max(left1, left2)
+                # 总长度偶数：中位数 = (左半最大 + 右半最小) / 2
+                else:
+                    return (max(left1, left2) + min(right1, right2)) / 2.0
+            
+            # ---------- 调整二分范围 ----------
+            # nums1 左半部分太大，需要把切分点 i 向左移
+            # 相当于是nums1[middle]>target，left = middle， right = middle - 1
+            elif left1 > right2:
+                right = i - 1
+            # nums2 左半部分太大，需要把切分点 i 向右移
+            elif left2 > right1:
+                left = i + 1
+```
+
+题目要求时间复杂度为logn级别的，考虑二分查找
+
+
+
+[寻找两个正序数组的中位数 | LeetCode 4_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV162PVzPECg/?spm_id_from=333.337.search-card.all.click)
+
+
+
 ## 栈
 
 ### [232. 用栈实现队列](https://leetcode.cn/problems/implement-queue-using-stacks/)
@@ -3126,6 +3205,202 @@ class Solution(object):
 DFS，采用后序遍历（左→右→根），自底向上找最近公共祖先：
 
 如果一个节点的左边找到 p、右边找到 q，那它就是答案！
+
+
+
+### [105. 从前序与中序遍历序列构造二叉树](https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)🔥（中等）
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def buildTree(self, preorder, inorder):
+        """
+        :type preorder: List[int]
+        :type inorder: List[int]
+        :rtype: Optional[TreeNode]
+        """
+        if len(preorder) == 0 and len(inorder) == 0:
+            return None
+        
+        # 前序遍历的第一个节点就是根节点
+        root = TreeNode(preorder[0])
+
+        # 寻找在中序遍历inorder中root的index
+        index = 0
+        for i in range(len(inorder)):
+            if inorder[i] == preorder[0]:
+                index = i
+                break
+        
+        preorder_left = preorder[1:1 + index]
+        inorder_left = inorder[:index]
+        root.left = self.buildTree(preorder_left, inorder_left)
+        preorder_right = preorder[index + 1:]
+        inorder_right = inorder[index + 1:]
+        root.right = self.buildTree(preorder_right, inorder_right)
+
+        return root
+```
+
+利用前序和中序遍历的特性，递归地把数组切成「根、左子树、右子树」三部分，不断重复直到树构建完成。
+
+
+
+### [106. 从中序与后序遍历序列构造二叉树](https://leetcode.cn/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)（中等）
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def buildTree(self, inorder, postorder):
+        """
+        :type inorder: List[int]
+        :type postorder: List[int]
+        :rtype: Optional[TreeNode]
+        """
+        if len(inorder) == 0 and len(postorder) == 0:
+            return None
+        
+        # 后序遍历的最后一个节点是根节点
+        root = TreeNode(postorder[-1])
+        
+        index = 0
+        # 在中序遍历序列中找到根节点对应的index
+        for i in range(len(inorder)):
+            if inorder[i] == postorder[-1]:
+                index = i
+                break
+        
+        inorder_left = inorder[:index]
+        postorder_left = postorder[:index]
+        root.left = self.buildTree(inorder_left, postorder_left)
+        inorder_right = inorder[index + 1:]
+        postorder_right = postorder[index:-1]
+        root.right = self.buildTree(inorder_right, postorder_right)
+
+        return root
+```
+
+
+
+### [112. 路径总和](https://leetcode.cn/problems/path-sum/)（简单）
+
+返回是否有  **从根节点到叶子节点** 路径总和等于给定目标和
+
+```
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def hasPathSum(self, root, targetSum):
+        """
+        :type root: Optional[TreeNode]
+        :type targetSum: int
+        :rtype: bool
+        """
+        if root is None:
+            return False
+
+        return self.dfs(root, targetSum - root.val)
+    
+    def dfs(self, current, target):
+        if current.left is None and current.right is None and target == 0:
+            return True
+        
+        if current.left is None and current.right is None and target != 0:
+            return False
+
+        if current.left:
+            target -= current.left.val
+            if self.dfs(current.left, target) == True:
+                return True
+            target += current.left.val
+        
+        if current.right:
+            target -= current.right.val
+            if self.dfs(current.right, target) == True:
+                return True
+            target += current.right.val
+        
+        return False
+```
+
+
+
+### [113. 路径总和 II](https://leetcode.cn/problems/path-sum-ii/)（中等）
+
+找出所有 **从根节点到叶子节点** 路径总和等于给定目标和的路径
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def pathSum(self, root, targetSum):
+        """
+        :type root: Optional[TreeNode]
+        :type targetSum: int
+        :rtype: List[List[int]]
+        """
+        self.res = []
+        self.path = []
+
+        if root is None:
+            return []
+
+        self.dfs(root, targetSum - root.val)
+
+        return self.res
+        
+    def dfs(self, current, target):
+        self.path.append(current.val)
+
+        if current.left is None and current.right is None and target == 0:
+            self.res.append(self.path[:])
+            return
+        
+        if current.left is None and current.right is None and target != 0:
+            return
+
+        if current.left:
+            target -= current.left.val
+            self.dfs(current.left, target)
+            target += current.left.val
+            self.path.pop()
+        
+        if current.right:
+            target -= current.right.val
+            self.dfs(current.right, target)
+            target += current.right.val
+            self.path.pop()
+        
+        return
+```
+
+
+
+### [437. 路径总和 III](https://leetcode.cn/problems/path-sum-iii/)🔥（中等）
+
+求该二叉树里节点值之和等于 `targetSum` 的 **路径** 的数目，注意：此题不一定是根节点到子节点
+
+```
+
+```
 
 
 
