@@ -2861,6 +2861,10 @@ class Solution(object):
 
 
 
+### [146. LRU 缓存](https://leetcode.cn/problems/lru-cache/)🔥（中等）
+
+
+
 ## 二叉树DFS
 
 前序遍历：中左右
