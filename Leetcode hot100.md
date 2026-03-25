@@ -204,6 +204,188 @@ class Solution(object):
 
 
 
+## 子串
+
+### [560. 和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)🔥（中等）
+
+```python
+class Solution(object):
+    def subarraySum(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        # 前缀和：记录从数组开头到当前元素的累计和
+        prefix = 0
+        # 结果：记录和为 k 的子数组数量
+        res = 0
+        # 哈希表：key = 前缀和，value = 该前缀和出现的次数
+        current_sum = {}
+        # 初始化：前缀和 0 出现 1 次（处理从数组开头就满足条件的子数组）
+        current_sum[prefix] = 1
+
+        # 遍历数组中的每个数字
+        for i in nums:
+            # 更新当前前缀和
+            prefix += i
+            
+            # 核心逻辑：如果 (当前前缀和 - k) 存在于哈希表中
+            # 说明存在 前缀和 = 当前前缀和 - k 的位置，这两个位置之间的子数组和为 k
+            if prefix - k in current_sum:
+                # 累加符合条件的子数组数量
+                res += current_sum[prefix - k]
+            
+            # 将当前前缀和加入哈希表
+            # 如果已存在，次数+1；不存在，设为1
+            if prefix in current_sum:
+                current_sum[prefix] += 1
+            else:
+                current_sum[prefix] = 1
+            
+            # 上面的 if-else 可以简化成这一行（你注释掉的那行）
+            # current_sum[prefix] = current_sum.get(prefix, 0) + 1
+        return res
+```
+
+前缀和
+
+
+
+### [239. 滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)🔥（困难）
+
+```
+class Solution(object):
+    def maxSlidingWindow(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+        # 双向队列用来存数组的索引
+        queue = collections.deque()
+        res = []
+
+        if len(nums) == 0 or k == 0:
+            return []
+        
+        for index, num in enumerate(nums):
+            while queue and nums[queue[-1]] <= num:
+                queue.pop()
+            
+            queue.append(index)
+
+            # 移除窗口队头边界外的元素
+            if queue[0] <= index - k:
+                queue.popleft()
+            
+            # 当窗口形成之后，向res中添加元素
+            # 如k=3时，index为2时窗口形成
+            if index >= k - 1:
+                res.append(nums[queue[0]])
+        
+        return res
+```
+
+**用「单调递减双向队列」维护滑动窗口内的最大值，把暴力解法 O (n・k) 优化到 O (n)**。
+
+1.只保留“有可能成为最大值”的元素
+
+2.维护单调递减的双端队列，队头是最大值
+
+3.新元素比队尾元素大时，弹出队尾元素
+
+4.队头元素不在滑动窗口内时，弹出
+
+
+
+### [76. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)🔥（困难）
+
+```python
+class Solution(object):
+    def minWindow(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: str
+        """
+         # need 字典：记录 t 中每个字符需要的数量
+        need = {}
+        # window 字典：记录当前窗口里每个字符的数量
+        window = {}
+        
+        # 滑动窗口的左右指针，左闭右开区间 [left, right)
+        left = 0
+        right = 0
+        
+        # valid：记录窗口中【满足 need 数量要求】的字符种类数
+        # 当 valid == len(need) 时，说明窗口已经覆盖了 t 所有字符
+        valid = 0
+        
+        # 记录最终结果的起始索引 & 最小长度
+        start = 0
+        length = float('inf')  # 初始设为无穷大
+
+        # 第一步：统计 t 中每个字符需要多少个，存入 need
+        for ch in t:
+            need[ch] = need.get(ch, 0) + 1
+
+        # 开始滑动窗口，右指针遍历 s
+        while right < len(s):
+            # 拿到当前要加入窗口的字符
+            ch = s[right]
+            # 右指针右移，扩大窗口
+            right += 1
+
+            # 如果当前字符是 t 里需要的
+            if ch in need:
+                # 窗口字典里这个字符数量 +1
+                window[ch] = window.get(ch, 0) + 1
+                # 如果窗口里这个字符数量 == need 需要的数量
+                # 说明这个字符【达标了】，valid +1
+                if window[ch] == need[ch]:
+                    valid += 1
+            
+            # 第二步：当窗口满足条件（valid 达标），开始收缩左指针，寻找最小窗口
+            while valid == len(need):
+                # 现在的窗口比之前记录的更小，更新最小窗口信息
+                if right - left < length:
+                    length = right - left  # 更新最小长度
+                    start = left          # 更新起始位置
+
+                # 要移除窗口的左边字符
+                left_ch = s[left]
+                # 左指针右移，缩小窗口
+                left += 1
+            
+                # 如果移除的字符是 t 里需要的
+                if left_ch in need:
+                    # 如果移除前，这个字符刚好达标，移除后就不达标了
+                    if window[left_ch] == need[left_ch]:
+                        valid -= 1
+                    # 窗口字典里这个字符数量 -1
+                    window[left_ch] -= 1
+        
+        # 最后：如果 length 还是无穷大，说明没找到，返回空
+        if length == float('inf'):
+            return ""
+        
+        # 截取最小窗口返回
+        return s[start : start + length]
+```
+
+滑动窗口+哈希表
+
+1.两个哈希表跟着：需求窗口和当前窗口字符
+
+2.左右指针：维护窗口
+
+3.右指针拓展：找到有效窗口
+
+4.左指针收缩：找到最小窗口
+
+
+
 ## 哈希表
 
 ### [242. 有效的字母异位词](https://leetcode.cn/problems/valid-anagram/)
@@ -1038,8 +1220,6 @@ class Solution(object):
 ```
 
 题目要求时间复杂度为logn级别的，考虑二分查找
-
-
 
 [寻找两个正序数组的中位数 | LeetCode 4_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV162PVzPECg/?spm_id_from=333.337.search-card.all.click)
 
@@ -2466,7 +2646,7 @@ class MyLinkedList(object):
 
 
 
-### [19. 删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)🔥
+### [19. 删除链表的倒数第 N 个结点](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/)🔥（中等）
 
 ```python
 # Definition for singly-linked list.
@@ -2501,7 +2681,7 @@ class Solution(object):
 
 
 
-### [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)🔥
+### [21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)🔥（简单）
 
 ```python
 # Definition for singly-linked list.
@@ -2530,7 +2710,7 @@ class Solution(object):
 
 
 
-### [160. 相交链表🔥](https://leetcode.cn/problems/intersection-of-two-linked-lists/)
+### [160. 相交链表🔥](https://leetcode.cn/problems/intersection-of-two-linked-lists/)（简单）
 
 ```python
 # Definition for singly-linked list.
@@ -2576,7 +2756,7 @@ class Solution(object):
 
 
 
-### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/)🔥
+### [206. 反转链表](https://leetcode.cn/problems/reverse-linked-list/)🔥（简单）
 
 ```python
 # Definition for singly-linked list.
@@ -2603,7 +2783,7 @@ class Solution(object):
 
 
 
-### [24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/)🔥
+### [24. 两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/)🔥（中等）
 
 ```python
 # Definition for singly-linked list.
@@ -2636,7 +2816,7 @@ class Solution(object):
 
 
 
-### [234. 回文链表](https://leetcode.cn/problems/palindrome-linked-list/)🔥
+### [234. 回文链表](https://leetcode.cn/problems/palindrome-linked-list/)🔥（简单）
 
 ```python
 # Definition for singly-linked list.
@@ -2714,7 +2894,7 @@ class Solution(object):
 
 
 
-### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)🔥
+### [141. 环形链表](https://leetcode.cn/problems/linked-list-cycle/)🔥（简单）
 
 ```python
 # Definition for singly-linked list.
@@ -2741,7 +2921,7 @@ class Solution(object):
 
 
 
-### [142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/)🔥
+### [142. 环形链表 II](https://leetcode.cn/problems/linked-list-cycle-ii/)🔥（中等）
 
 ```python
 # Definition for singly-linked list.
@@ -2805,7 +2985,7 @@ class Solution(object):
 
 
 
-### [2. 两数相加](https://leetcode.cn/problems/add-two-numbers/)🔥
+### [2. 两数相加](https://leetcode.cn/problems/add-two-numbers/)🔥（中等）
 
 ```python
 # Definition for singly-linked list.
@@ -2861,7 +3041,190 @@ class Solution(object):
 
 
 
+### [138. 随机链表的复制](https://leetcode.cn/problems/copy-list-with-random-pointer/)🔥（中等）
+
+```python
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, x, next=None, random=None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
+"""
+
+class Solution(object):
+    def copyRandomList(self, head):
+        """
+        :type head: Node
+        :rtype: Node
+        """
+        # 原节点 -> 新节点 的映射字典
+        old_to_new = {}
+        
+        # 第一步：创建所有新节点，建立映射
+        current = head
+        while current:
+            new_node = Node(current.val)
+            old_to_new[current] = new_node
+            current = current.next
+
+        # 第二步：设置新节点的 next 和 random 指针
+        current = head
+        while current:
+            new_node = old_to_new[current]
+            new_node.next = old_to_new.get(current.next)
+            new_node.random = old_to_new.get(current.random)
+            current = current.next
+
+        # 返回新链表的头节点
+        return old_to_new.get(head)
+```
+
+先把所有节点复制一遍存起来，再回头统一连指针
+
+`old_to_new` 是一个**Python 字典**，`get()` 是字典自带的**安全取值函数**。
+
+
+
+### [148. 排序链表](https://leetcode.cn/problems/sort-list/)🔥（中等）
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def sortList(self, head):
+        """
+        :type head: Optional[ListNode]
+        :rtype: Optional[ListNode]
+        """
+         # 递归终止条件：空链表或只有一个节点，本身已有序
+        if head is None or head.next is None:
+            return head
+        
+        # 快慢指针找中点（slow最终指向链表前半段的最后一个节点）
+        slow = head
+        fast = head.next
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        
+        # 分割链表为两部分
+        first = head
+        second = slow.next
+        slow.next = None
+
+        # 递归排序左右两部分
+        first = self.sortList(first)
+        second = self.sortList(second)
+
+        return self.mergeTwoLists(first, second)
+    
+    
+    def mergeTwoLists(self, list1, list2):
+        """
+        :type list1: Optional[ListNode]
+        :type list2: Optional[ListNode]
+        :rtype: Optional[ListNode]
+        """
+        if list1 is None:
+            return list2
+        elif list2 is None:
+            return list1
+        elif list1.val < list2.val:
+            list1.next = self.mergeTwoLists(list1.next, list2)
+            return list1
+        else:
+            list2.next = self.mergeTwoLists(list1, list2.next)
+            return list2
+```
+
+**时间复杂度**：O (n log n)，归并排序的标准时间复杂度。
+
+合并两个有序链表和[21. 合并两个有序链表](https://leetcode.cn/problems/merge-two-sorted-lists/)🔥（简单）一致
+
+
+
 ### [146. LRU 缓存](https://leetcode.cn/problems/lru-cache/)🔥（中等）
+
+```python
+class ListNode:
+    def __init__(self, key = 0, val=0):
+        # 因为要满足get和put函数时间复杂度为O(1)所以使用双向链表
+        self.key = key
+        self.val = val
+        self.next = None
+        self.prev = None
+
+class LRUCache(object):
+
+    def __init__(self, capacity):
+        """
+        :type capacity: int
+        """
+        self.capacity = capacity
+        # 哈希表：key -> 双向链表节点，O(1) 查找
+        self.cache = {}
+        self.head = ListNode()
+        self.tail = ListNode()
+        self.head.next = self.tail
+        self.tail.prev = self.head
+    
+    def remove(self, node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+    
+    def add_to_head(self, node):
+        node.next = self.head.next
+        node.prev = self.head
+        self.head.next.prev = node
+        self.head.next = node
+
+    def get(self, key):
+        """
+        :type key: int
+        :rtype: int
+        """
+        if key not in self.cache:
+            return -1
+        
+        # 从哈希表拿到对应的节点
+        node = self.cache[key]
+        # 先把节点从原来位置删除
+        self.remove(node)
+        # 再把节点移到头部（标记为最近使用）
+        self.add_to_head(node)
+        return node.val
+
+    def put(self, key, value):
+        """
+        :type key: int
+        :type value: int
+        :rtype: None
+        """
+        if key in self.cache:
+            self.remove(self.cache[key])
+            self.cache.pop(key)
+        node = ListNode(key, value)
+        self.cache[key] = node
+        self.add_to_head(node)
+
+        # 如果缓存超过最大容量，删除最久未使用的节点
+        if len(self.cache) > self.capacity:
+            last_use = self.tail.prev
+            self.remove(last_use)
+            self.cache.pop(last_use.key)
+
+# Your LRUCache object will be instantiated and called as such:
+# obj = LRUCache(capacity)
+# param_1 = obj.get(key)
+# obj.put(key,value)
+```
+
+双向链表，面试常考，建议直接背诵
 
 
 
