@@ -384,6 +384,8 @@ class Solution(object):
 
 4.左指针收缩：找到最小窗口
 
+[最小覆盖子串 | LeetCode 76_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1m4isBBE69/?spm_id_from=333.337.search-card.all.click&vd_source=9e77deab9cbf476a360f590847f021a1)
+
 
 
 ## 哈希表
@@ -1551,6 +1553,119 @@ q.popleft()  # 删第一个 → 队列 → BFS（广度优先）
 | deque     | popleft() | 队列 | BFS    |
 
 有时可以用[] + pop(0)模拟队列，但是list.pop(0) → 慢到爆炸 O (n) deque.popleft() → 飞快 O (1)
+
+
+
+## 堆
+
+### [215. 数组中的第K个最大元素](https://leetcode.cn/problems/kth-largest-element-in-an-array/)🔥（中等）
+
+你必须设计并实现时间复杂度为 `O(n)` 的算法解决此问题。
+
+```python
+class Solution(object):
+    def findKthLargest(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        pivot = random.choice(nums)
+
+        left = [x for x in nums if x > pivot]
+        mid = [x for x in nums if x == pivot]
+        right = [x for x in nums if x < pivot]
+
+        if k <= len(left):
+            return self.findKthLargest(left, k)
+        elif k <= len(left) + len(mid):
+            return pivot
+        else:
+            return self.findKthLargest(right, k - len(left) - len(mid))
+```
+
+快速选择，时间复杂度O（n），空间复杂度O（n），方法使用了额外的数组空间，如果原地创建分区，可将空间复杂度降至O（1）
+
+
+
+### [347. 前 K 个高频元素](https://leetcode.cn/problems/top-k-frequent-elements/)🔥（中等）
+
+```python
+class Solution(object):
+    def topKFrequent(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+    # 第一步：统计每个数字出现的频率，用字典存储
+        nums_map = {}
+        # 遍历数组中的每一个数字
+        for index in range(len(nums)):
+            # key=数字，value=出现次数
+            nums_map[nums[index]] = nums_map.get(nums[index], 0) + 1
+        
+        # 第二步：构建一个大小为k的小顶堆
+        pri_que = []
+
+        # 遍历频率字典中的每个数字和它的频率
+        for key, count in nums_map.items():
+            # 把（频率，数字）推入小顶堆
+            # 堆会自动按频率排序，堆顶 = 频率最小
+            heapq.heappush(pri_que, (count, key))
+            
+            # 只要堆的大小超过k，就弹出堆顶（最小频率）
+            # 这样能保证堆里永远只保留频率最大的k个
+            if len(pri_que) > k:
+                heapq.heappop(pri_que)
+        
+        # 第三步：把堆中剩下的k个元素取出，倒序存入结果
+        # 因为小顶堆弹出顺序是：从小到大
+        # 我们要从后往前放，让结果从大到小显示
+        res = [0] * k
+        for i in range(k - 1, -1, -1):
+            # [0] 位置 = 频率 [1] 位置 = 数字本身
+            res[i] = heapq.heappop(pri_que)[1]
+        
+        # 返回最终结果
+        return res
+```
+
+小顶堆，对应的python数据结构为
+
+import heapq
+
+初始化堆：
+
+pri_que = []
+
+heapq.heappush(堆(pri_queue), 要加的元素)
+
+```python
+import heapq
+
+heap = []        # 空堆
+heapq.heappush(heap, 5)
+heapq.heappush(heap, 2)
+heapq.heappush(heap, 8)
+
+print(heap)  # [2,5,8]  最小的 2 自动跑到最上面
+```
+
+heapq.heappop
+
+```python
+import heapq
+
+heap = [2,5,8]
+print(heapq.heappop(heap))  # 弹出 2
+print(heapq.heappop(heap))  # 弹出 5
+print(heap)  # [8]
+```
+
+Python **没有直接大顶堆**
+
+**大顶堆 = 小顶堆 + 存负数**
 
 
 
