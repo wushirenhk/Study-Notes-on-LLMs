@@ -2825,6 +2825,77 @@ class Solution(object):
 
 
 
+### [23. 合并 K 个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists/)🔥（困难）
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def mergeKLists(self, lists):
+        """
+        :type lists: List[Optional[ListNode]]
+        :rtype: Optional[ListNode]
+        """
+        if not lists:
+            return None
+
+        res = lists[0]
+        for i in range(1, len(lists)):
+            res = self.mergeTwoLists(res, lists[i])
+        return res
+    
+    def mergeTwoLists(self, list1, list2):
+        if list1 is None:
+            return list2
+        elif list2 is None:
+            return list1
+        elif list1.val < list2.val:
+            list1.next = self.mergeTwoLists(list1.next, list2)
+            return list1
+        else:
+            list2.next = self.mergeTwoLists(list2.next, list1)
+            return list2 
+```
+
+用合并两个有序链表的思路写会超时
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution(object):
+    def mergeKLists(self, lists):
+        """
+        :type lists: List[Optional[ListNode]]
+        :rtype: Optional[ListNode]
+        """
+        dummy = ListNode(0)
+        current = dummy
+        heap = []
+
+        for index, node in enumerate(lists):
+            if node:
+                heapq.heappush(heap, (node.val, index, node))
+
+        while heap:
+            val, i, node = heapq.heappop(heap)
+            current.next = node
+            current = current.next
+            if node.next:
+                heapq.heappush(heap, (node.next.val, index, node.next))
+
+        return dummy.next
+```
+
+维护一个最小堆
+
+
+
 ### [160. 相交链表🔥](https://leetcode.cn/problems/intersection-of-two-linked-lists/)（简单）
 
 ```python
