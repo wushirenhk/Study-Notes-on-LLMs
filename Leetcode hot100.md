@@ -2,6 +2,39 @@
 
 https://lqn53uggjd7.feishu.cn/wiki/VZMEwd6R2iTwIMk32uNc9wbCnpg?from=from_copylink
 
+## 华为高频面试
+
+第一梯队
+LeetCode 20.有效的括号:5次 ok
+第二梯队(高频)
+LeetCode 200.岛屿数量:5次 ok
+LeetCode1.两数之和:4次 ok 
+LeetCode3.无重复字符的最长子串:3次ok
+第三梯队3
+LeetCode46.全排列:3次 ok
+LeetCode 994.腐烂的橘子:3次
+LeetCode 394.字符串解码:2次 ok
+LeetCode 739.每日温度:2次 ok
+LeetCode56.合并区间:2次 ok
+LeetCode 64.最小路径和:2次 ok
+第四梯队(出现过至少一次，建议补充刷)
+LeetCode 155.最小栈 ok
+LeetCode 986.区间列表的交集
+LeetCode 132.分割回文串| ok
+LeetCode 11.盛最多水的容器 ok
+LeetCode 49.字母异位词分组 ok
+LeetCode 71.简化路径
+LeetCode 217.存在重复元素 ok
+LeetCode 1423.可获得的最大点数
+
+
+
+华为一面
+
+[239. 滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)🔥（困难）
+
+
+
 ## 双指针&滑动窗口
 
 ### [283. 移动零](https://leetcode.cn/problems/move-zeroes/)🔥
@@ -254,7 +287,7 @@ class Solution(object):
 
 ### [239. 滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)🔥（困难）
 
-```
+```python
 class Solution(object):
     def maxSlidingWindow(self, nums, k):
         """
@@ -296,6 +329,28 @@ class Solution(object):
 3.新元素比队尾元素大时，弹出队尾元素
 
 4.队头元素不在滑动窗口内时，弹出
+
+
+
+### 知识：enmerate 和 items（）：
+
+`items()` 是字典专用方法，一次返回 **(键，值)** 一对数据。
+
+for key, count in map.items():
+
+`enumerate()` 只用于**列表、数组这种可索引序列**，作用是：
+
+**返回 (索引，元素)**
+
+```
+lst = [10, 20, 30]
+for idx, val in enumerate(lst):
+    print(idx, val)
+# 输出：
+# 0 10
+# 1 20
+# 2 30
+```
 
 
 
@@ -757,18 +812,19 @@ class Solution(object):
 ```python
 class Solution(object):
     def backtracking(self, nums, used, path, result):
-        if len(path) == len(nums):
-            result.append(path[:])
-            return
-
         for i in range(len(nums)):
-            if used[i]:
+            if len(path) == len(nums):
+                result.append(path[:])
+                return
+
+            if used[i] == False:
+                path.append(nums[i])
+                used[i] = True
+                self.backtracking(nums, used, path, result)
+                path.pop()
+                used[i] = False
+            else:
                 continue
-            used[i] = True
-            path.append(nums[i])
-            self.backtracking(nums, used, path, result)
-            path.pop()
-            used[i] = False
 
     def permute(self, nums):
         """
@@ -1353,6 +1409,35 @@ class Solution(object):
 
 
 
+### [71. 简化路径](https://leetcode.cn/problems/simplify-path/)（中等）
+
+```python
+class Solution(object):
+    def simplifyPath(self, path):
+        """
+        :type path: str
+        :rtype: str
+        """ 
+        names = path.split("/")
+        stack = []
+        
+        for x in names:
+            # 如果片段是 .. 表示回到上一级目录
+            if x == "..":
+                # 只有栈不为空时，才弹出栈顶（回到上一级）
+                if stack:
+                    stack.pop()
+            # 如果片段 非空 且 不是 .（当前目录），说明是有效目录名
+            elif x and x != ".":
+                # 把有效目录名加入栈
+                stack.append(x)
+
+        # 最终用 / 连接栈里的目录，并在最前面加根目录 /
+        return "/" + "/".join(stack)
+```
+
+
+
 ### [155. 最小栈](https://leetcode.cn/problems/min-stack/)🔥（中等）
 
 ```python
@@ -1413,24 +1498,39 @@ class Solution(object):
         :type s: str
         :rtype: str
         """
+        # 初始化栈，用来存储数字、字母、括号
         stack = []
+        
+        # 遍历字符串里的每一个字符
         for ch in s:
+            # 只要不是 】，就直接入栈
             if ch != ']': 
                 stack.append(ch)
+            
+            # 遇到 】，开始解码
             else:
+                # 1. 先弹出 【 前面的所有字母，拼成要重复的字符串
                 temp = ""
                 while stack[-1] != '[':
                     temp = stack.pop() + temp
-                stack.pop() # 把'['弹出来
+                
+                # 2. 把 【 弹出去（没用了）
+                stack.pop() 
+                
+                # 3. 弹出【前面的所有数字（可能是多位数）
                 num = ''
                 while stack and stack[-1].isdigit():
                     num = stack.pop() + num
+                
+                # 4. 字符串 × 数字，结果放回栈
                 stack.append(temp * int(num))
+        
+        # 把栈里所有内容拼起来就是最终结果
         res = ''
         while stack:
             res = stack.pop() + res
 
-        return res        
+        return res       
 ```
 
 
@@ -2634,7 +2734,7 @@ class Solution(object):
 
 有点类似72. 编辑距离
 
-dp【i】【j】：长度为[0, i - 1]的字符串text1与长度为[0, j - 1]的字符串text2的最长公共子序列为dp【i】【j】
+dp【i】【j】：长度为[0, i - 1]的字符串text1与长度为[0, j - 1]的字符串text2的最长公共子序列长度为dp【i】【j】
 
 
 
@@ -4185,7 +4285,7 @@ BFS，和[102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tre
 ```python
 class Solution(object):
     # 四个方向：上、右、下、左
-    direction = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+    directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]
 
     def numIslands(self, grid):
         """
@@ -4206,19 +4306,20 @@ class Solution(object):
 
         return res
     
-    def dfs(self, grid, visited, x, y):
-        if visited[x][y] == True or grid[x][y] == "0":
-            return
+    def dfs(self, visited, grid, x, y):
+        # x判断边界条件是和行数比较，y判断边界条件是和列数比较
+            if x < 0 or y < 0 or x >= len(grid) or y >= len(grid[0]):
+                return
+                
+            if visited[x][y] == True or grid[x][y] == "0":
+                return
 
-        visited[x][y] = True
+            visited[x][y] = True
 
-        for i, j in self.direction:
-            next_x = x + i
-            next_y = y + j
-            if next_x < 0 or next_x >= len(grid) or next_y < 0 or next_y >= len(grid[0]):
-                continue
-
-            self.dfs(grid, visited, next_x, next_y)
+            for i, j in self.directions:
+                next_x = x + i
+                next_y = y + j
+                self.dfs(visited, grid, next_x, next_y)
 ```
 
 
