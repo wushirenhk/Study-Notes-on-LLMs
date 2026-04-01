@@ -5,7 +5,8 @@ https://lqn53uggjd7.feishu.cn/wiki/VZMEwd6R2iTwIMk32uNc9wbCnpg?from=from_copylin
 ## 华为高频面试
 
 第一梯队
-LeetCode 20.有效的括号:5次 ok
+
+LeetCode 20.有效的括号:5次 ok 
 第二梯队(高频)
 LeetCode 200.岛屿数量:5次 ok
 LeetCode1.两数之和:4次 ok 
@@ -1858,6 +1859,8 @@ class Solution(object):
 
 ## 普通数组
 
+
+
 ### [56. 合并区间](https://leetcode.cn/problems/merge-intervals/)🔥（中等）
 
 ```python
@@ -1885,6 +1888,95 @@ class Solution(object):
 ```
 
 本质上就是贪心算法，类似于55. 跳跃游戏
+
+
+
+### [88. 合并两个有序数组](https://leetcode.cn/problems/merge-sorted-array/)（简单）
+
+给你两个按 **非递减顺序** 排列的整数数组 `nums1` 和 `nums2`，另有两个整数 `m` 和 `n` ，分别表示 `nums1` 和 `nums2` 中的元素数目。
+
+请你 **合并** `nums2` 到 `nums1` 中，使合并后的数组同样按 **非递减顺序** 排列。
+
+**注意：**最终，合并后数组不应由函数返回，而是存储在数组 `nums1` 中。为了应对这种情况，`nums1` 的初始长度为 `m + n`，其中前 `m` 个元素表示应合并的元素，后 `n` 个元素为 `0` ，应忽略。`nums2` 的长度为 `n` 。
+
+```python
+class Solution:
+    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+        """
+        Do not return anything, modify nums1 in-place instead.
+        """
+        res = []
+        p1 = 0
+        p2 = 0
+        while p1 < m or p2 < n:
+            if p1 == m:
+                res.append(nums2[p2])
+                p2 += 1
+            elif p2 == n:
+                res.append(nums1[p1])
+                p1 += 1
+            elif nums1[p1] < nums2[p2]:
+                res.append(nums1[p1])
+                p1 += 1
+            else:
+                res.append(nums2[p2])
+                p2 += 1
+        
+        nums1[:] = res
+```
+
+解法1：双指针
+
+面试中使用了额外的数组空间
+
+时间复杂度：O(m+n)。
+指针移动单调递增，最多移动 m+n 次，因此时间复杂度为 O(m+n)。
+
+空间复杂度：O(m+n)。
+需要建立长度为 m+n 的中间数组res。
+
+
+
+```python
+# 指针 p1 指向 nums1 有效元素的最后一位
+        p1 = m - 1
+        # 指针 p2 指向 nums2 有效元素的最后一位
+        p2 = n - 1
+        # tail 指向合并后 nums1 总长度的最后一位（从后往前放数据）
+        tail = m + n - 1
+        
+        # 只要还有元素没处理完就继续循环
+        while p2 >= 0 or p1 >= 0:
+            if p1 == -1:
+                # nums1 已经全部处理完，直接把 nums2 剩下的元素放进去
+                nums1[tail] = nums2[p2]
+                p2 -= 1
+            elif p2 == -1:
+                # nums2 已经全部处理完，直接把 nums1 剩下的元素放进去
+                nums1[tail] = nums1[p1]
+                p1 -= 1
+            elif nums1[p1] < nums2[p2]:
+                # 谁大就把谁放在当前 tail 位置（从大到小放）
+                nums1[tail] = nums2[p2]
+                p2 -= 1
+            else:
+                # nums1 当前元素更大，放入当前位置
+                nums1[tail] = nums1[p1]
+                p1 -= 1
+            
+            # 放完一个元素，指针向前移动一位
+            tail -= 1
+```
+
+解法二：双指针+倒序
+
+那么如何直接避免覆盖 nums 1中的元素呢？观察可知，nums 1 的后半部分是空的，可以直接覆盖而不会影响结果。因此可以指针设置为从后向前遍历，每次取两者之中的较大者放进 nums 1的最后面。
+
+时间复杂度：O(m+n)。
+指针移动单调递减，最多移动 m+n 次，因此时间复杂度为 O(m+n)。
+
+空间复杂度：O(1)。
+直接对数组 nums 1原地修改，不需要额外空间。
 
 
 
