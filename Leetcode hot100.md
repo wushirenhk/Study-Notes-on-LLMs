@@ -1931,6 +1931,52 @@ class Solution(object):
 
 
 
+### [986. 区间列表的交集](https://leetcode.cn/problems/interval-list-intersections/)（中等）
+
+```python
+class Solution:
+    def intersection(self, List1, List2):
+        left_1, right_1 = List1[0], List1[1]
+        left_2, right_2 = List2[0], List2[1]
+
+        # 两个区间交集的左边界：取两个左端点的较大值
+        left = max(left_1, left_2)
+        # 两个区间交集的右边界：取两个右端点的较小值
+        right = min(right_1, right_2)
+
+        # 如果左边界 > 右边界，说明无交集，返回空
+        if left > right:
+            return []
+        else:
+            return [left, right]
+
+    # 主函数：求两个有序区间列表的所有交集
+    def intervalIntersection(self, firstList: List[List[int]], secondList: List[List[int]]) -> List[List[int]]:
+        i, j = 0, 0
+        res = []
+
+        # 双指针遍历，只要任意一个列表遍历完就结束
+        while i < len(firstList) and j < len(secondList):
+            # 计算当前两个指针对应区间的交集
+            path = self.intersection(firstList[i], secondList[j])
+            # 如果有交集，加入结果集
+            if len(path) != 0:
+                res.append(path)
+
+            # 移动指针策略：
+            # 哪个区间的右端点更小，就移动哪个指针（因为它不可能再和后面的区间相交）
+            if firstList[i][1] < secondList[j][1]:
+                i += 1
+            else:
+                j += 1
+
+        return res
+```
+
+双指针，本题亦有归并排序解法
+
+
+
 ### [88. 合并两个有序数组](https://leetcode.cn/problems/merge-sorted-array/)（简单）
 
 给你两个按 **非递减顺序** 排列的整数数组 `nums1` 和 `nums2`，另有两个整数 `m` 和 `n` ，分别表示 `nums1` 和 `nums2` 中的元素数目。
@@ -2499,7 +2545,7 @@ class Solution(object):
 
 
 
-### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)🔥
+### [300. 最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -3231,6 +3277,16 @@ class Solution(object):
         return dummy_head.next
             
 ```
+
+
+
+### [25. K 个一组翻转链表](https://leetcode.cn/problems/reverse-nodes-in-k-group/)🔥（困难）
+
+```
+
+```
+
+[Reverse Nodes in K-Group 可视化](https://jiaxuan-yue.github.io/projects/reverse-k-group/)
 
 
 
