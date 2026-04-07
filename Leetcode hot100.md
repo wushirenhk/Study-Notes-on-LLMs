@@ -296,17 +296,15 @@ class Solution(object):
         :type k: int
         :rtype: List[int]
         """
+        if len(nums) == 0 or k == 0:
+            return []
         # 双向队列用来存数组的索引
         queue = collections.deque()
         res = []
-
-        if len(nums) == 0 or k == 0:
-            return []
         
         for index, num in enumerate(nums):
             while queue and nums[queue[-1]] <= num:
                 queue.pop()
-            
             queue.append(index)
 
             # 移除窗口队头边界外的元素
@@ -330,6 +328,48 @@ class Solution(object):
 3.新元素比队尾元素大时，弹出队尾元素
 
 4.队头元素不在滑动窗口内时，弹出
+
+注意：双向队列中存的一定是序列
+
+
+
+### [1423. 可获得的最大点数](https://leetcode.cn/problems/maximum-points-you-can-obtain-from-cards/)（中等）
+
+```python
+class Solution:
+    def maxScore(self, cardPoints: List[int], k: int) -> int:
+        # 解题思路：
+        # 只能从数组两端拿 k 张牌，等价于：
+        # 数组总和 - 【连续不拿的中间区域的最小和】
+        # 不拿的区域长度 = 总长度 - k
+        
+        # 计算中间不拿的窗口长度
+        window_size = len(cardPoints) - k
+        
+        # 临时和：用于计算滑动窗口的和
+        temp_sum = 0
+        
+        # 第一步：先计算第一个窗口（最左侧）的和
+        for i in range(window_size):
+            temp_sum += cardPoints[i]
+        
+        # 记录最小窗口和，初始为第一个窗口的和
+        min_sum = temp_sum
+
+        # 第二步：滑动窗口，从左向右移动
+        # 每次移动：减去离开窗口的最左元素，加上新进入窗口的右侧元素
+        for i in range(window_size, len(cardPoints)):
+            temp_sum += cardPoints[i] - cardPoints[i - window_size]
+            # 更新最小窗口和
+            min_sum = min(min_sum, temp_sum)
+        
+        # 最终最大得分 = 数组总和 - 中间最小不拿区域的和
+        return sum(cardPoints) - min_sum
+```
+
+将求取k张卡牌的最大值问题，转化为n-k张卡牌最小值问题，
+
+滑动窗口解决，由于剩余卡牌是连续的，使用一个固定长度为 n−k 的滑动窗口对数组 cardPoints 进行遍历，求出滑动窗口最小值，然后用所有卡牌的点数之和减去该最小值，即得到了拿走卡牌点数之和的最大值。
 
 
 
