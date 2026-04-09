@@ -808,6 +808,8 @@ class Solution(object):
 
 ### [39. 组合总和](https://leetcode.cn/problems/combination-sum/)🔥（中等）
 
+4.09
+
 ```python
 class Solution(object):
     def backtracking(self, candidates, target, total, start_index, path, result):
@@ -869,6 +871,8 @@ class Solution(object):
 当 `start_index == len(s)` 时，说明我们已经从字符串的起始位置（0）一直切割到了字符串的末尾（len (s)），意味着完成了一次**完整且有效的切割**（所有切割出的子串都是回文）
 
 此时需要把当前的切割路径（`path`）保存到结果集 `result` 中，然后终止当前递归分支
+
+类似用回溯解决的题目[139. 单词拆分](https://leetcode.cn/problems/word-break/)🔥（中等）但如果用回溯会超时
 
 
 
@@ -2484,7 +2488,7 @@ class Solution(object):
 
 
 
-### [322. 零钱兑换](https://leetcode.cn/problems/coin-change/)🔥
+### [322. 零钱兑换](https://leetcode.cn/problems/coin-change/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -2517,7 +2521,7 @@ class Solution(object):
 
 
 
-### [279. 完全平方数](https://leetcode.cn/problems/perfect-squares/)🔥
+### [279. 完全平方数](https://leetcode.cn/problems/perfect-squares/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -2542,7 +2546,7 @@ class Solution(object):
 
 
 
-### [139. 单词拆分](https://leetcode.cn/problems/word-break/)🔥
+### [139. 单词拆分](https://leetcode.cn/problems/word-break/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -2572,6 +2576,26 @@ class Solution(object):
 `dp[i]` 表示前`i`个字符能否拆分，是判断的核心目标；
 
 `j` 是分割点，`s[j:i]` 是分割后 “最后一个待验证的单词”；
+
+```python
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        wordSet = set(wordDict)
+        return self.backtracking(s, wordSet, 0)
+
+    def backtracking(self, s, wordSet, start_index):
+        if start_index == len(s):
+            return True
+        
+        for i in range(start_index, len(s)):
+            word = s[start_index : i + 1]
+            if word in wordSet and self.backtracking(s, wordSet, i + 1):
+                return True
+        
+        return False
+```
+
+如果用回溯算法，不进行记忆化搜索，会超时
 
 
 
@@ -2629,7 +2653,7 @@ dp[i] [1]第i天不持有股票最大值
 
 
 
-### [53. 最大子数组和🔥](https://leetcode.cn/problems/maximum-subarray/)
+### [53. 最大子数组和](https://leetcode.cn/problems/maximum-subarray/)🔥（中等）
 
 ```python
 class Solution(object):
@@ -2651,7 +2675,7 @@ class Solution(object):
 
 
 
-### [152. 乘积最大子数组](https://leetcode.cn/problems/maximum-product-subarray/)🔥
+### [152. 乘积最大子数组](https://leetcode.cn/problems/maximum-product-subarray/)🔥（中等）
 
 ```python
 class Solution(object):
