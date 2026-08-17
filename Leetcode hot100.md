@@ -290,7 +290,7 @@ class Solution(object):
 
 
 
-### [239. 滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)🔥（困难）3.30 4.07 4.09 4.14
+### [239. 滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)🔥（困难）3.30 4.07 4.09 4.14 8.17
 
 ```python
 class Solution(object):
@@ -4543,7 +4543,7 @@ BFS，和[102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tre
 
 ## 图论
 
-### [200. 岛屿数量](https://leetcode.cn/problems/number-of-islands/)🔥（中等）3.30 4.09 4.14
+### [200. 岛屿数量](https://leetcode.cn/problems/number-of-islands/)🔥（中等）3.30 4.09 4.14 8.17
 
 ```python
 class Solution(object):
