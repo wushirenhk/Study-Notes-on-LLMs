@@ -1845,6 +1845,47 @@ Python **没有直接大顶堆**
 
 
 
+### [295. 数据流的中位数](https://leetcode.cn/problems/find-median-from-data-stream/)🔥（困难）
+
+```python
+class MedianFinder:
+
+    def __init__(self):
+        self.small = []
+        self.large = []
+        
+    def addNum(self, num: int) -> None:
+        if not self.small or num <= -self.small[0]:
+            heapq.heappush(self.small, -num)
+        else:
+            heapq.heappush(self.large, num)
+        
+        if len(self.small) > len(self.large) + 1:
+            maxofsmall = -heapq.heappop(self.small)
+            heapq.heappush(self.large, maxofsmall)
+        
+        if len(self.large) > len(self.small) + 1:
+            minoflarge = heapq.heappop(self.large)
+            heapq.heappush(self.small, -minoflarge)
+
+    def findMedian(self) -> float:
+        if len(self.small) > len(self.large):
+            return -self.small[0]
+        elif len(self.large) > len(self.small):
+            return self.large[0]
+        else:
+            return (-self.small[0] + self.large[0]) / 2.0
+        
+
+
+# Your MedianFinder object will be instantiated and called as such:
+# obj = MedianFinder()
+# obj.addNum(num)
+# param_2 = obj.findMedian()
+```
+
+
+
 ## 贪心算法
 
 ### [55. 跳跃游戏](https://leetcode.cn/problems/jump-game/)🔥（中等）
