@@ -42,7 +42,7 @@ LeetCode 1423.可获得的最大点数
 
 ## 双指针&滑动窗口
 
-### [283. 移动零](https://leetcode.cn/problems/move-zeroes/)🔥
+### [283. 移动零](https://leetcode.cn/problems/move-zeroes/)🔥（简单）
 
 ```python
 class Solution(object):
@@ -83,7 +83,7 @@ class Solution(object):
 
 
 
-### [75. 颜色分类🔥](https://leetcode.cn/problems/sort-colors/)
+### [75. 颜色分类🔥](https://leetcode.cn/problems/sort-colors/)（中等）
 
 ```python
 class Solution(object):
@@ -109,7 +109,7 @@ class Solution(object):
 
 
 
-### [11. 盛最多水的容器](https://leetcode.cn/problems/container-with-most-water/)🔥
+### [11. 盛最多水的容器](https://leetcode.cn/problems/container-with-most-water/)🔥(中等) 9.06
 
 ```python
 class Solution(object):
@@ -138,7 +138,7 @@ class Solution(object):
 
 
 
-### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)🔥(中等) 4.09 4.14
+### [3. 无重复字符的最长子串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/)🔥(中等) 4.09 4.14 9.06
 
 ```python
 class Solution(object):
@@ -167,9 +167,66 @@ class Solution(object):
         
 ```
 
+暴力枚举
+
+外层 `for left`：把字符串每一个下标 `left`，都作为**子串起始位置**。
+
+对每个起点`left`：
+
+- 创建空集合 `hashset`，记录当前子串已经见过的字符。
+
+- `right` 从 left 开始不断向右移动，扩大窗口。
+
+- 如果 `s[right]` **不在集合**：字符加入集合，右指针右移，当前长度 + 1。
+
+- 如果 `s[right]` **已经在集合（重复）**：停止向右扩展，更新全局最大长度，跳出 while 循环，换下一个`left`起点。
+
+  时间复杂度：\(O(n^2)\)
+
+  空间复杂度：\(O(min(n, \text{字符集大小}))\)
+
+  
+
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        max_len = 0
+        hashset = set()
+        right = -1
+        n = len(s)
+
+        for left in range(n):
+            if left != 0:
+                hashset.remove(s[left - 1])
+            
+            while right + 1 < n and s[right + 1] not in hashset:
+                hashset.add(s[right + 1])
+                right += 1
+            
+            max_len = max(max_len, right - left + 1)
+        
+        return max_len
+```
+
+- `left`：滑动窗口**左边界**，for 循环一步步向右移动。
+- `right`：滑动窗口**右边界**，**只会增大，不会回退**，是优化核心。
+- `hashset`：保存当前窗口`[left, right]`里面所有字符，用来快速判断字符是否重复。
+
+流程：
+
+1. 每一轮`left`向右走一格，把窗口左边滑出去的字符从集合中删除。
+2. 在不重复、不越界的前提下，尽可能把`right`向右扩大，把新字符加入集合。
+3. `[left, right]`就是以`left`为起点能得到的最长无重复子串，计算窗口长度，更新全局最大值`maxlen`。
+
+> 和暴力法最大区别：暴力每次换 left，right 重置回到 left 重新扫描；滑动窗口 right 不回头，避免大量重复访问字符。
+
+时间复杂度：\(O(n)\)
+
+空间复杂度：\(O(min(n, \text{字符集大小}))\)
 
 
-### [438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)🔥
+
+### [438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)🔥 9.06
 
 ```python
 class Solution(object):
@@ -244,7 +301,25 @@ class Solution(object):
 
 ## 子串
 
-### [560. 和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)🔥（中等）
+### [560. 和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)🔥（中等） 9.06
+
+```python
+class Solution:
+    def subarraySum(self, nums: List[int], k: int) -> int:
+        prefix = 0
+        res = 0
+        mp = {0: 1}
+
+        for num in nums:
+            prefix += num
+            if prefix - k in mp:
+                res += mp[prefix - k]
+            mp[prefix] = mp.get(prefix, 0) + 1
+        
+        return res
+```
+
+
 
 ```python
 class Solution(object):
@@ -286,11 +361,22 @@ class Solution(object):
         return res
 ```
 
-前缀和
+前缀和 + 哈希表
+
+```
+字典.get(key, 默认值)
+```
+
+> 作用：获取字典中`key`对应的 value。
+>
+> - 如果**key 存在**：返回 key 对应的实际 value
+> - 如果**key 不存在**：不会报 KeyError，返回你传入的**默认值**（这里是 0），不会自动往字典添加 key。
+
+https://www.bilibili.com/video/BV1fj2QBxE1Q/?spm_id_from=333.337.search-card.all.click&vd_source=9e77deab9cbf476a360f590847f021a1
 
 
 
-### [239. 滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)🔥（困难）3.30 4.07 4.09 4.14 8.17
+### [239. 滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)🔥（困难）3.30 4.07 4.09 4.14 8.17 9.06
 
 ```python
 class Solution(object):
@@ -309,12 +395,6 @@ class Solution(object):
         for index, num in enumerate(nums):
             while queue and nums[queue[-1]] <= num:
                 queue.pop()
-            queue.append(index)
-
-            # 移除窗口队头边界外的元素
-            if queue[0] <= index - k:
-                queue.popleft()
-            
             # 当窗口形成之后，向res中添加元素
             # 如k=3时，index为2时窗口形成
             if index >= k - 1:
@@ -1636,7 +1716,7 @@ class Solution(object):
 
 
 
-### [42. 接雨水](https://leetcode.cn/problems/trapping-rain-water/)🔥（困难）
+### [42. 接雨水](https://leetcode.cn/problems/trapping-rain-water/)🔥（困难）9.01 9.06
 
 ```python
 class Solution(object):
@@ -1661,7 +1741,60 @@ class Solution(object):
         return res
 ```
 
-单调栈中为递增序列，求左右比当前更大的元素
+https://www.bilibili.com/video/BV1R8zkBgEKG/?spm_id_from=333.337.search-card.all.click&vd_source=9e77deab9cbf476a360f590847f021a1
+
+单调栈
+
+栈**存储柱子索引**，栈内对应的高度保持**单调递减**：
+
+1. 遇到比栈顶更高的柱子，说明找到了凹槽的**右边界**；栈顶弹出的元素就是**凹槽底部**；此时新的栈顶就是**凹槽左边界**。
+2. 能存多少水，由左右两个挡板中更矮的那一个决定：`min(左挡板,右挡板)`。
+3. 存水高度 = 矮挡板高度 − 凹槽底部高度；存水宽度 = 右边界下标 − 左边界下标 −1；面积 = 高 × 宽，累加到总结果。
+4. 如果当前柱子比栈顶矮，压入栈，继续往后找右边界。
+
+时间复杂度O（n）
+
+空间复杂度O（n）
+
+
+
+双指针
+
+```python
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        if not height:
+            return 0
+        
+        n = len(height)
+
+        left_max = [0] * n
+        right_max = [0] * n
+
+        left_max[0] = height[0]
+        for i in range(1, n):
+            left_max[i] = max(height[i], left_max[i - 1])
+
+        right_max[-1] = height[-1]
+        for i in range(n - 2, -1, -1):
+            right_max[i] = max(height[i], right_max[i + 1])
+        
+        res = 0
+        for i in range(n):
+            res += min(left_max[i], right_max[i]) - height[i]
+        
+        return res
+```
+
+range(start, stop, step)
+
+range(起始值, 终止值(不包含!), 步长)
+
+range(n - 2, -1, -1)的话，从n-2开始，到0停止，取到0
+
+时间复杂度O（n）
+
+空间复杂度O（n）
 
 
 
@@ -4584,7 +4717,7 @@ BFS，和[102. 二叉树的层序遍历](https://leetcode.cn/problems/binary-tre
 
 ## 图论
 
-### [200. 岛屿数量](https://leetcode.cn/problems/number-of-islands/)🔥（中等）3.30 4.09 4.14 8.17
+### [200. 岛屿数量](https://leetcode.cn/problems/number-of-islands/)🔥（中等）3.30 4.09 4.14 8.17 9.06
 
 ```python
 class Solution(object):
@@ -4628,51 +4761,65 @@ class Solution(object):
 
 
 
-### [994. 腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/)🔥（中等）
+### [994. 腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/)🔥（中等）9.06
 
 ```python
-class Solution(object):
-    def orangesRotting(self, grid):
-        """
-        :type grid: List[List[int]]
-        :rtype: int
-        """
-        queue = collections.deque()
-        # queue = []
-        time = 0
-        fresh = 0
-        for i in range(len(grid)):
-            for j in range(len(grid[0])):
+class Solution:
+    def orangesRotting(self, grid: List[List[int]]) -> int:
+        time = 0        # 记录腐烂扩散所需时间（分钟）
+        fresh = 0       # 统计初始新鲜橘子的数量
+        m = len(grid)   # 网格行数
+        n = len(grid[0])# 网格列数
+        queue = collections.deque() # BFS队列，保存腐烂橘子坐标
+        directions = [[0, 1], [1, 0], [0, -1], [-1, 0]] # 右、下、左、上四个移动方向
+
+        # 遍历整个网格，预处理新鲜橘子和初始腐烂橘子
+        for i in range(m):
+            for j in range(n):
                 if grid[i][j] == 1:
-                    fresh += 1
-                # 将腐烂橘子的坐标放到队列里
+                    fresh += 1               # 新鲜橘子计数
                 elif grid[i][j] == 2:
-                    queue.append((i, j))
+                    queue.append((i, j))     # 腐烂橘子入队，多源BFS起点
         
-        direction = [[0, 1], [1, 0], [0, -1], [-1, 0]]
-
+        # 队列不为空且还有新鲜橘子，继续向外感染
         while queue and fresh > 0:
+            # 逐层遍历，一层代表1分钟的扩散
             for i in range(len(queue)):
-                current = queue.popleft()
-                # current = queue.pop(0)
-                # 遍历腐烂橘子的四个方向
-                for p, q in direction:
-                    current_x = current[0] + p
-                    current_y = current[1] + q
-
-                    if current_x < 0 or current_x >= len(grid) or current_y < 0 or current_y >= len(grid[0]) or grid[current_x][current_y] != 1:
+                current = queue.popleft() # 取出当前腐烂橘子
+                # 向四个相邻格子扩散
+                for i, j in directions:
+                    next_x = current[0] + i
+                    next_y = current[1] + j
+                    # 越界 或者不是新鲜橘子，跳过
+                    if next_x < 0 or next_y < 0 or next_x >= m or next_y >= n or grid[next_x][next_y] != 1:
                         continue
-                    # 将周围新鲜橘子腐烂，将坐标加入队列
-                    grid[current_x][current_y] = 2
-                    queue.append((current_x, current_y))
-                    fresh -= 1
-            time += 1
+                    grid[next_x][next_y] = 2       # 新鲜橘子变为腐烂
+                    queue.append((next_x, next_y)) # 新腐烂橘子加入队列，下一轮扩散
+                    fresh -= 1                     # 新鲜橘子数量减1
+            time += 1 # 完成一轮扩散，时间+1
         
+        # 仍剩下无法腐烂的新鲜橘子返回-1，否则返回耗时
         if fresh != 0:
             return -1
         else:
             return time
 ```
+
+**核心算法：多源 BFS**
+
+先收集所有初始腐烂橘子入队，从多个起点同时向外一层一层感染新鲜橘子，每一层对应 1 分钟，适合模拟随时间扩散的过程。
+
+**变量作用**
+
+`queue`保存本轮腐烂橘子坐标；`fresh`统计新鲜橘子总数；`time`记录经过的分钟数；`direction`四个遍历方向。
+
+**流程**
+
+①遍历网格，统计新鲜橘子、收集腐烂橘子；
+
+②逐层 BFS，每层循环代表 1 分钟，遇到新鲜橘子将其腐烂并入队，新鲜橘子数量减 1；
+
+③BFS 结束，若仍剩余新鲜橘子返回 - 1，否则返回耗时`time`。
 
 BFS
 
