@@ -1758,7 +1758,7 @@ https://www.bilibili.com/video/BV1R8zkBgEKG/?spm_id_from=333.337.search-card.all
 
 
 
-双指针
+推荐用双指针
 
 ```python
 class Solution:
@@ -1831,7 +1831,13 @@ class Solution(object):
 
 [84.柱状图中最大的矩形 | 代码随想录](https://programmercarl.com/0084.柱状图中最大的矩形.html#思路)
 
+单调栈，波波微课
 
+https://www.bilibili.com/video/BV1tKXQBREkj/?spm_id_from=333.337.search-card.all.click&vd_source=9e77deab9cbf476a360f590847f021a1
+
+时间复杂度O（N）
+
+空间复杂度O（N）
 
 ### 知识：queue（列表模拟）和 deque（双端队列）
 
@@ -1978,44 +1984,55 @@ Python **没有直接大顶堆**
 
 
 
-### [295. 数据流的中位数](https://leetcode.cn/problems/find-median-from-data-stream/)🔥（困难）
+### [295. 数据流的中位数](https://leetcode.cn/problems/find-median-from-data-stream/)🔥（困难）9.07
 
 ```python
+import heapq
 class MedianFinder:
 
     def __init__(self):
+        # small：保存较小一半的数字，存入负数，模拟大顶堆
         self.small = []
+        # large：保存较大一半的数字，原生小顶堆
         self.large = []
         
     def addNum(self, num: int) -> None:
+        # 如果small为空，或者新数字小于等于左半边最大值，加入small堆
+        # 【注意】一定要判断small不为空
         if not self.small or num <= -self.small[0]:
-            heapq.heappush(self.small, -num)
+            heapq.heappush(self.small, -num) #存负数实现大顶堆
         else:
             heapq.heappush(self.large, num)
         
+        # 平衡两个堆的长度，差距不能超过1
+        # 左边small元素太多，把最大的一个移到右边large
         if len(self.small) > len(self.large) + 1:
             maxofsmall = -heapq.heappop(self.small)
             heapq.heappush(self.large, maxofsmall)
-        
+        # 右边large元素太多，把最小的一个移到左边small
         if len(self.large) > len(self.small) + 1:
             minoflarge = heapq.heappop(self.large)
             heapq.heappush(self.small, -minoflarge)
 
     def findMedian(self) -> float:
+        # 总数为奇数，左边更长，中位数是左半边最大值
         if len(self.small) > len(self.large):
             return -self.small[0]
+        # 总数为奇数，右边更长，中位数是右半边最小值
         elif len(self.large) > len(self.small):
             return self.large[0]
+        # 总数偶数，取左右堆顶的平均值
         else:
             return (-self.small[0] + self.large[0]) / 2.0
-        
-
-
-# Your MedianFinder object will be instantiated and called as such:
-# obj = MedianFinder()
-# obj.addNum(num)
-# param_2 = obj.findMedian()
 ```
+
+堆算法：
+
+复杂度：插入\(O(\log n)\)，查询\(O(1)\)，空间\(O(n)\)
+
+small 存放**较小一半数字**，我们希望随时拿到这一半里**最大的数**，也就是需要一个**大顶堆**。
+
+python里面原生只有小顶堆，没有大顶堆，因为需要用-小顶堆模拟大顶堆
 
 
 
@@ -3985,7 +4002,7 @@ class Solution(object):
 
 
 
-### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)🔥（简单）
+### [94. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)🔥（简单） 9.07
 
 ```python
 # Definition for a binary tree node.
@@ -4064,40 +4081,36 @@ class Solution(object):
 
 
 
-### [98. 验证二叉搜索树](https://leetcode.cn/problems/validate-binary-search-tree/)🔥（中等）
+### [98. 验证二叉搜索树](https://leetcode.cn/problems/validate-binary-search-tree/)🔥（中等）9.07
 
 ```python
 # Definition for a binary tree node.
-# class TreeNode(object):
+# class TreeNode:
 #     def __init__(self, val=0, left=None, right=None):
 #         self.val = val
 #         self.left = left
 #         self.right = right
-class Solution(object):
-    def isValidBST(self, root):
-        """
-        :type root: Optional[TreeNode]
-        :rtype: bool
-        """
-        def dfs(node, vec):
+class Solution:
+    def isValidBST(self, root: Optional[TreeNode]) -> bool:
+        res = []
+        # 中序遍历，将二叉搜索树转换为有序数组
+        def dfs(node):
             if node is None:
-                return
-            # 中序遍历，将二叉搜索树转换为有序数组
-            dfs(node.left, self.vec)
-            self.vec.append(node.val)
-            dfs(node.right, self.vec)
-
-        self.vec = []
-        dfs(root, self.vec)
-        for i in range(0, len(self.vec) - 1):
-            #注意要大于等于，搜索树里不能有相同元素
-            if self.vec[i] >= self.vec[i + 1]:
+                return None
+            dfs(node.left)
+            res.append(node.val)
+            dfs(node.right)
+        
+        dfs(root)
+        for i in range(0, len(res) - 1):
+             #注意要大于等于，搜索树里不能有相同元素，严格递增序列
+            if res[i] >= res[i + 1]:
                 return False
             
         return True
 ```
 
-DFS，二叉搜索树（BST）的中序遍历结果一定是「严格递增数组」
+DFS，**二叉搜索树（BST）的中序遍历结果一定是「严格递增数组」**
 
 
 
@@ -4761,7 +4774,7 @@ class Solution(object):
 
 
 
-### [994. 腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/)🔥（中等）9.06
+### [994. 腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/)🔥（中等）9.06 9.07
 
 ```python
 class Solution:
@@ -4793,6 +4806,7 @@ class Solution:
                     # 越界 或者不是新鲜橘子，跳过
                     if next_x < 0 or next_y < 0 or next_x >= m or next_y >= n or grid[next_x][next_y] != 1:
                         continue
+                        # continue：跳出当前这一轮 for i, j in directions: 循环，直接进入下一个方向，不会执行后面腐烂橘子的代码
                     grid[next_x][next_y] = 2       # 新鲜橘子变为腐烂
                     queue.append((next_x, next_y)) # 新腐烂橘子加入队列，下一轮扩散
                     fresh -= 1                     # 新鲜橘子数量减1
