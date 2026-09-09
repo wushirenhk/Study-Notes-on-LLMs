@@ -1525,7 +1525,7 @@ class Solution(object):
 
 https://www.bilibili.com/video/BV1yYwJzJE69/?spm_id_from=333.337.search-card.all.click&vd_source=9e77deab9cbf476a360f590847f021a1
 
-### [32. 最长有效括号](https://leetcode.cn/problems/longest-valid-parentheses/)🔥（困难）
+### [32. 最长有效括号](https://leetcode.cn/problems/longest-valid-parentheses/)🔥（困难）9.10
 
 ```python
 class Solution(object):
@@ -1542,10 +1542,10 @@ class Solution(object):
                 # 栈里只存左括号 ( 的下标
                 stack.append(i)
             # 只要栈是非空的，就是合法匹配，非法的括号直接跳过去了
-            elif stack:
-                mark[stack[-1]] =  True
-                mark[i] = True
-                stack.pop()
+            elif stack:          # 遇到右括号，并且栈里还有左括号可以匹配
+                mark[stack[-1]] = True # 栈顶左括号标记合法
+                mark[i] = True         # 当前这个右括号标记合法
+                stack.pop()            # 左括号下标弹出，完成配对
         
         temp = 0
         res = 0
@@ -1558,6 +1558,10 @@ class Solution(object):
 
         return res
 ```
+
+复杂度
+
+时间 O (n)，两轮遍历字符串；空间 O (n)，栈 + mark 数组
 
 
 
