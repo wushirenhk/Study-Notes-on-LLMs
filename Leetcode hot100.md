@@ -1490,7 +1490,7 @@ class MyQueue(object):
 
 
 
-### [20. 有效的括号](https://leetcode.cn/problems/valid-parentheses/)🔥（简单）4.10
+### [20. 有效的括号](https://leetcode.cn/problems/valid-parentheses/)🔥（简单）4.10 9.09
 
 ```python
 class Solution(object):
@@ -1509,7 +1509,7 @@ class Solution(object):
             elif item == '{':
                 stack.append('}')
             # 注意要先判断栈是否为空，再判断栈顶元素是否和当前元素相等
-            # 右括号必须匹配栈顶，否则直接不合格！
+            # 右括号必须匹配栈顶，否则直接不合格！not stack：栈为空 → 现在来了一个右括号，但前面没有对应的左括号
             elif not stack or stack[-1] != item:
                 return False
             else:
@@ -1523,7 +1523,7 @@ class Solution(object):
 
 注意：因为一开始已经初始化stack= []，所以不能通过stack == None来判断stack是否为空
 
-
+https://www.bilibili.com/video/BV1yYwJzJE69/?spm_id_from=333.337.search-card.all.click&vd_source=9e77deab9cbf476a360f590847f021a1
 
 ### [32. 最长有效括号](https://leetcode.cn/problems/longest-valid-parentheses/)🔥（困难）
 
@@ -1687,32 +1687,38 @@ class Solution(object):
 
 
 
-### [739. 每日温度](https://leetcode.cn/problems/daily-temperatures/)🔥（中等）
+### [739. 每日温度](https://leetcode.cn/problems/daily-temperatures/)🔥（中等）9.09
 
 ```python
-class Solution(object):
-    def dailyTemperatures(self, temperatures):
-        """
-        :type temperatures: List[int]
-        :rtype: List[int]
-        """
-        res = [0] * len(temperatures)
-        stack = [0] # 存入元素对应的下标
-        for i in range(1, len(temperatures)):
-            if temperatures[i] <= temperatures[stack[-1]]:
-                stack.append(i)
-            else:
-                while stack and temperatures[i] > temperatures[stack[-1]]:
-                    res[stack[-1]] = i - stack[-1]
-                    stack.pop()
-                stack.append(i)
-
-        return res
+class Solution:
+    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
+        n = len(temperatures)
+        res = [0] * n
+        stack = []
+        for i in range(n):
+            while stack and temperatures[i] > temperatures[stack[-1]]:
+                j = stack.pop()
+                res[j] = i - j
+            stack.append(i)
+        
+        return res 
 ```
 
 这里我们要使用递增循序（再强调一下是指从栈头到栈底的顺序），因为只有递增的时候，栈里要加入一个元素i的时候，才知道栈顶元素在数组中右面第一个比栈顶元素大的元素是i。
 
 递增顺序是找比当前元素大的
+
+核心思路
+
+1. 栈存**下标**，方便计算天数差；栈维护**单调递减**。栈底到栈顶
+2. 遍历到`i`，只要当前温度比栈顶温度高，说明栈顶位置的答案就是`i-j`，弹出栈顶并记录结果。
+3. 直到栈空或者当前温度不再大于栈顶，把`i`压栈继续等待后面更大温度。
+4. 遍历结束，栈剩下的元素没有后续更高温，结果保持默认 0。
+
+复杂度
+
+- 时间 O (n)：每个下标最多入栈、出栈各一次
+- 空间 O (n)：栈最多存全部下标
 
 
 
@@ -1798,28 +1804,23 @@ range(n - 2, -1, -1)的话，从n-2开始，到0停止，取到0
 
 
 
-### [84. 柱状图中最大的矩形](https://leetcode.cn/problems/largest-rectangle-in-histogram/)🔥（困难）
+### [84. 柱状图中最大的矩形](https://leetcode.cn/problems/largest-rectangle-in-histogram/)🔥（困难）9.09
 
 ```python
-class Solution(object):
-    def largestRectangleArea(self, heights):
-        """
-        :type heights: List[int]
-        :rtype: int
-        """
-        stack = [0]
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        heights = [0] + heights + [0]
+        n = len(heights)
         res = 0
-        heights.insert(0,0)
-        heights.append(0) 
-        # 也可以写成[0] + heights + [0]
+        stack = []
 
-        for i in range(1, len(heights)):
-            while stack and heights[i] <= heights[stack[-1]]:
-                mid_height = stack.pop()
-                if stack:
-                    h = heights[mid_height]
-                    w = i - stack[-1] - 1
-                    res = max(res, h * w)
+        for i in range(n):
+            while stack and heights[i] < heights[stack[-1]]:
+                j = stack.pop()
+                height = heights[j]
+                width = i - stack[-1] - 1
+                current_area = height * width
+                res = max(res, current_area)
             stack.append(i)
         
         return res
@@ -1834,6 +1835,15 @@ class Solution(object):
 单调栈，波波微课
 
 https://www.bilibili.com/video/BV1tKXQBREkj/?spm_id_from=333.337.search-card.all.click&vd_source=9e77deab9cbf476a360f590847f021a1
+
+使用**单调递增栈**，栈保存柱子下标；数组首尾补 0，保证所有柱子都能被处理。
+
+遍历每个下标`i`：
+
+1. 若当前高度小于栈顶高度，弹出栈顶下标`j`作为待计算柱子；
+2. `j`的右边界是`i`，左边界是弹出后新栈顶`stack[-1]`；
+3. 宽度 = 右边界 − 左边界 − 1，面积 = 高度 × 宽度，更新最大面积；
+4. 当前下标`i`入栈，维持栈递增。
 
 时间复杂度O（N）
 
